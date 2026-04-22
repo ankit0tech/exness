@@ -1,0 +1,1 @@
+This project is exness like platform for trading and speculation
