@@ -3,7 +3,7 @@ import express, { Request, Response } from "express";
 const router = express.Router();
 
 
-router.post('/signin', async (req: Request, res: Response) => {
+router.post('/login', async (req: Request, res: Response) => {
     try {
         
     } catch(error: any) {

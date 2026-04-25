@@ -1,0 +1,159 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserType {
+  ADMIN
+  USER
+}
+
+enum Side {
+  LONG
+  SHORT
+}
+
+enum TradeStatus {
+  OPEN
+  CLOSED
+  LIQUIDATED
+}
+
+enum Currency {
+  USD
+}
+
+enum LedgerType {
+  DEPOSIT
+  WITHDRAWAL
+  TRADE_PNL
+  FEE
+  ADJUSTMENT
+}
+
+
+model userinfo {
+  id            Int @id @default(autoincrement())
+  email         String @unique @db.VarChar(255)
+  first_name    String?
+  last_name     String?
+  google_id     String? @unique
+  provider      String @default("email")
+
+  user_type     UserType @default(USER)
+
+  account account?
+  trades trade[]
+
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+}
+
+
+model account {
+  id            Int @id @default(autoincrement())
+  user_id       Int @unique
+  user          userinfo @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  currency      Currency @default(USD)
+
+  balance       BigInt @default(0)
+  used_margin    BigInt @default(0)
+  free_margin    BigInt @default(0)
+
+  ledger ledger_entry[]
+  trades trade[]
+
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+}
+
+
+model instrument {
+  id            Int @id @default(autoincrement())
+  symbol        String @unique // BTCUSD, EURUSD, XAUUSD
+  base_asset      String // BTC, EUR, XAU
+  quote_currency  Currency @default(USD)
+  
+  max_leverage   Int
+  min_quantity   BigInt @default(1)
+  is_active      Boolean @default(true)
+
+  trades        trade[]
+
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+}
+
+
+model trade {
+  id            Int @id @default(autoincrement())
+
+  user_id       Int
+  user          userinfo @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  account_id    Int
+  account       account @relation(fields: [account_id], references: [id], onDelete: Cascade)
+
+  instrument_id Int
+  instrument    instrument @relation(fields: [instrument_id], references: [id])
+
+  side          Side
+  status        TradeStatus @default(OPEN)
+
+  quantity      BigInt
+  leverage      Int
+  entry_price   BigInt 
+  entry_time    DateTime @default(now())
+  notional      BigInt
+  margin_used   BigInt
+  fees          BigInt @default(0)
+
+  exit_price    BigInt?
+  exit_time     DateTime?
+
+  realized_pnl  BigInt @default(0)
+
+  ledger_entries ledger_entry[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([user_id, status])
+  @@index([account_id, status])
+  @@index([instrument_id])
+}
+
+
+// statment history
+model ledger_entry {
+  id            Int @id @default(autoincrement())
+
+  account_id    Int
+  account       account @relation(fields: [account_id], references: [id], onDelete: Cascade)
+
+  trade_id      Int?
+  trade         trade? @relation(fields: [trade_id], references: [id], onDelete: SetNull)
+
+  type          LedgerType
+  amount        BigInt
+  balance_after BigInt
+  meta          Json?
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  @@index([account_id, created_at])
+  @@index([trade_id])
+}

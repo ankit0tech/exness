@@ -1,6 +1,8 @@
 import express from 'express';
 import cors from 'cors';
 import usersRoute from './route/usersRoute.js';
+import authRoute from './route/auth.js';
+import { config } from './config.js';
 
 const app = express();
 
@@ -9,7 +11,7 @@ app.use(express.json());
 
 app.use(
     cors({
-        origin: 'http://localhost:5173',
+        origin: config.frontend.origins,
         methods: ['GET', 'POST', 'DELETE', 'PUT'],
         allowedHeaders: ['Content-Type', 'Authorization'],
         credentials: true,
@@ -43,10 +45,10 @@ app.use((req, res, next) => {
     next();
 });
 
-// app.use((req, res, next) => { 
-//     res.setHeader('Cross-Origin-Opener-Policy', 'unsafe-none');
-//     next();
-// });
+app.use((req, res, next) => { 
+    res.setHeader('Cross-Origin-Opener-Policy', 'unsafe-none');
+    next();
+});
 
 
 // app.get('/', (request, response) => {
@@ -55,8 +57,10 @@ app.use((req, res, next) => {
 
 
 app.use('/users', usersRoute);
+app.use('/auth', authRoute);
 
-const port = 5555;
+
+const port = config.server.port;
 app.listen(port, () => {
     console.log(`App is listening to port ${port}`);
-})
+});
