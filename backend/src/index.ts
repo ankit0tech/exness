@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import usersRoute from './route/usersRoute.js';
 import authRoute from './route/auth.js';
+import tradeRoute from './route/tradeRoute.js';
 import { config } from './config.js';
 
 const app = express();
@@ -9,14 +10,15 @@ const app = express();
 
 app.use(express.json());
 
-app.use(
-    cors({
-        origin: config.frontend.origins,
-        methods: ['GET', 'POST', 'DELETE', 'PUT'],
-        allowedHeaders: ['Content-Type', 'Authorization'],
-        credentials: true,
+const corsOptions = {
+    origin: config.frontend.origins,
+    methods: ['GET', 'POST', 'DELETE', 'PUT'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+};
 
-    })
+app.use(
+    cors(corsOptions)
 );
 
 app.use((req, res, next) => {
@@ -51,13 +53,14 @@ app.use((req, res, next) => {
 });
 
 
-// app.get('/', (request, response) => {
-//     return response.status(200).json({"data": "Welcome"});
-// });
+app.get('/', (request, response) => {
+    return response.status(200).json({"data": "Welcome"});
+});
 
 
 app.use('/users', usersRoute);
 app.use('/auth', authRoute);
+app.use('/trade', tradeRoute);
 
 
 const port = config.server.port;

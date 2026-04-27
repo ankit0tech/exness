@@ -89,6 +89,7 @@ model instrument {
   max_leverage   Int
   min_quantity   BigInt @default(1)
   is_active      Boolean @default(true)
+  fees_per_unit  Int @default(0)
 
   trades        trade[]
 
