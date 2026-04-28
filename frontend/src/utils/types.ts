@@ -1,4 +1,4 @@
-export type OpenTrade = {
+export type Trade = {
     id: number;
     user_id: number;
     account_id: number;
