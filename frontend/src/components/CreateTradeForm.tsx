@@ -30,6 +30,7 @@ const CreateTradeForm = ({ fetchTrades }) => {
         if (tradeLong) {
             api.post('/trade/create/long', data)
             .then((_response) => {
+                enqueueSnackbar("Trade created successfully", {variant: "success"});
                 fetchTrades();
             })
             .catch((error: any) => {
@@ -40,6 +41,7 @@ const CreateTradeForm = ({ fetchTrades }) => {
         } else {
             api.post('/trade/create/short', data)
             .then((_response) => {
+                enqueueSnackbar("Trade created successfully", {variant: "success"});
                 fetchTrades();
             })
             .catch((error: any) => {
@@ -162,7 +164,7 @@ const CreateTradeForm = ({ fetchTrades }) => {
 
                 <button
                     type='submit'
-                    className={`text-sm border rounded-sm outline-hidden text-white py-2 px-4 active:scale-98 transition-transform transition-colors duration-300 ${tradeLong ? 'bg-blue-600 text-white border-blue-800' : 'bg-red-600 text-white border-red-800'}`}
+                    className={`cursor-pointer text-sm border rounded-sm outline-hidden text-white py-2 px-4 active:scale-98 transition-transform transition-colors duration-300 ${tradeLong ? 'bg-blue-600 text-white border-blue-800' : 'bg-red-600 text-white border-red-800'}`}
                 >
                     { tradeLong ? 'Confirm Buy' : 'Confirm Sell' }
                 </button>
