@@ -3,6 +3,7 @@ import cors from 'cors';
 import usersRoute from './route/usersRoute.js';
 import authRoute from './route/auth.js';
 import tradeRoute from './route/tradeRoute.js';
+import accountRoute from './route/accountRoute.js';
 import { config } from './config.js';
 
 const app = express();
@@ -54,13 +55,14 @@ app.use((req, res, next) => {
 
 
 app.get('/', (request, response) => {
-    return response.status(200).json({"data": "Welcome"});
+    return response.status(200).json({data: "Welcome"});
 });
 
 
 app.use('/users', usersRoute);
 app.use('/auth', authRoute);
 app.use('/trade', tradeRoute);
+app.use('/account', accountRoute);
 
 
 const port = config.server.port;

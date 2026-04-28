@@ -4,7 +4,7 @@ import { enqueueSnackbar } from "notistack";
 
 const CreateTradeForm = ({ fetchTrades }) => {
     
-    const SATS_PER_BTC = 1000000;
+    const SATS_PER_BTC = 100000000;
 
     const [tradeLong, setTradeLong] = useState<boolean>(true);
     const [instrument, setInstrument] = useState<string|null>('BTCUSD');
@@ -26,28 +26,23 @@ const CreateTradeForm = ({ fetchTrades }) => {
             // side: tradeLong ? 'LONG' : 'SHORT'
         };
 
-        console.log(data);
 
         if (tradeLong) {
             api.post('/trade/create/long', data)
-            .then((response) => {
+            .then((_response) => {
                 fetchTrades();
-                console.log("response:", response)
             })
             .catch((error: any) => {
-                console.log("error: ", error);
                 console.log("message: ", error.response);
                 enqueueSnackbar('Failed to open buy trade', {variant: "error"});
             });
 
         } else {
             api.post('/trade/create/short', data)
-            .then((response) => {
+            .then((_response) => {
                 fetchTrades();
-                console.log("response:", response)
             })
             .catch((error: any) => {
-                console.log("error: ", error);
                 console.log("message: ", error.response);
                 enqueueSnackbar('Failed to open sell trade', {variant: "error"});
             });
@@ -60,13 +55,13 @@ const CreateTradeForm = ({ fetchTrades }) => {
         <div className="flex flex-col gap-2 min-w-[200px]">
             <div className="flex flex-row gap-1 w-full items-stretch">
                 <button
-                    className={`w-full text-sm px-6 py-2 border border-black border-blue-600 _rounded-md ${tradeLong ? 'bg-blue-600 text-white' : 'bg-white text-blue-700'}`}
+                    className={`hover:cursor-pointer w-full text-sm px-6 py-2 border border-black border-blue-600 _rounded-md ${tradeLong ? 'bg-blue-600 text-white' : 'bg-white text-blue-700'}`}
                     onClick={() => setTradeLong(true)}
                 >
                     Buy
                 </button>
                 <button
-                    className={`w-full text-sm px-6 py-2 border border-black border-red-600 _rounded-md ${tradeLong ? 'bg-white text-red-500' : 'bg-red-500 text-white'}`}
+                    className={`hover:cursor-pointer w-full text-sm px-6 py-2 border border-black border-red-600 _rounded-md ${tradeLong ? 'bg-white text-red-500' : 'bg-red-500 text-white'}`}
                     onClick={() => setTradeLong(false)}
                 >
                     Sell

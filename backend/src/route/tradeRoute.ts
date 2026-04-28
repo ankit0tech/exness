@@ -1,8 +1,7 @@
 import express, { Request, Response } from "express";
-import trade from "../zod/tradeZod";
+import tradeZod from "../zod/tradeZod";
 // import { PrismaClient } from "@prisma/client";
 import { PrismaClient } from '../generated/prisma/client.js';
-
 import { authMiddleware } from "../utils/middleware";
 
 const prisma = new PrismaClient();
@@ -34,9 +33,8 @@ router.post('/create/long', authMiddleware, async (req: Request, res: Response) 
         if(userId === undefined) {
             return res.status(401).json({ message: "Issue with authentication" });
         }
-        console.log(req.body);
         
-        const result = trade.safeParse(req.body);
+        const result = tradeZod.safeParse(req.body);
         
         if(result.success) {
             
@@ -137,8 +135,6 @@ router.post('/create/long', authMiddleware, async (req: Request, res: Response) 
                     }
                 });
             });
-            
-            console.log("Trade executed successfully");
             
             return res.status(200).json({
                 message: "Trade executed successfully"
@@ -254,7 +250,7 @@ router.post('/create/short', authMiddleware, async (req: Request, res: Response)
         }
         console.log(req.body);
         
-        const result = trade.safeParse(req.body);
+        const result = tradeZod.safeParse(req.body);
         
         if(result.success) {
             const reqQuantity = BigInt(result.data.quantity);

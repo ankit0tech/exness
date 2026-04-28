@@ -4,28 +4,17 @@ import type { UTCTimestamp } from 'lightweight-charts';
 
 // import { eventNames } from "process";
 import { useEffect, useRef, useState } from "react";
-import Button from "../components/Button";
 import api from "../utils/api.js";
 import { enqueueSnackbar } from "notistack";
 import type { Trade } from "../utils/types.js";
-import { formatDateTime, prettifyString } from "../utils/formatUtils.js";
 import CreateTradeForm from "../components/CreateTradeForm.js";
 import ListTrades from "../components/ListTrades.js";
 
 const HomePage = () => {
 
-    const SATS_PER_BTC = 1000000;
-    // const [instrument, setInstrument] = useState<string|null>('BTCUSD');
-    // const [quantity, setQuantity] = useState<number>(0.2);
-    // const [leverage, setLeverage] = useState<number>(1);
     const [openTrades, setOpenTrades] = useState<Trade[]>([]);
     const [closedTrades, setClosedTrades] = useState<Trade[]>([]);
-    const [showOpenTrades, setShowOpenTrades] = useState<boolean>(true);
-    const [tradeBuy, setTradeBuy] = useState<boolean>(true);
-
-    // const [socket, setSocket] = useState<WebSocket|null>(null);
     const chartRef = useRef<HTMLDivElement|null>(null);
-    // const binanceWebSocketUrl = "wss://fstream.binance.com/market/ws/btcusdt@markPrice";
     const backendWebSocketurl = "ws://localhost:3000";
     const historicAPI = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1m&limit=30"
 
@@ -147,7 +136,6 @@ const HomePage = () => {
     const fetchOpenTrades = () => {
         api.get('/trade/open-trades')
         .then((response) => {
-            console.log(response);
             setOpenTrades(response.data.trades);
         })
         .catch((error: any) => {
@@ -159,7 +147,6 @@ const HomePage = () => {
     const fetchClosedTrades = () => {
         api.get('/trade/closed-trades')
         .then((response) => {
-            console.log(response);
             setClosedTrades(response.data.trades);
         })
         .catch((error: any) => {
@@ -167,25 +154,18 @@ const HomePage = () => {
             enqueueSnackbar("Failed to load closed trades", {variant: "error"});
         });
     }
-    useEffect(() => {
-        fetchTrades();
-    }, [showOpenTrades]);
 
 
-
-
-
-    
     return (
         <div className="flex flex-col gap-4 p-4">
-            <div className="text-sm text-gray-800">
+            {/* <div className="text-sm text-gray-800">
                 {usermail}
-            </div>
+            </div> */}
 
             <div className="flex flex-row gap-2">
                 <div className="w-full ring ring-gray-700 rounded-sm p-4">
                     <div 
-                        className="w-full h-[600px]"
+                        className="w-full h-[480px]"
                         ref={chartRef} 
                     >
                     </div>

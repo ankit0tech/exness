@@ -1,4 +1,27 @@
 
+
+export const formatQuantity = (input: string): string => {
+    const STATS_PER_BTC = 8;
+
+    const padded = input.padStart(STATS_PER_BTC+1, "0");
+    const whole  = padded.slice(0, -STATS_PER_BTC);
+    const frac = padded.slice(-STATS_PER_BTC);
+    const fracTrimmed = frac.replace(/0+$/, "");
+
+    const result = fracTrimmed ? `${whole}.${fracTrimmed}` : whole;
+
+    return result;
+}
+
+export const formatPrice = (input: string): string => {
+    input = input.slice(0, -4);
+    input = input.slice(0, -2) + "." + input.slice(-2);
+    return Number(input).toLocaleString('en-US', {
+        style: 'currency',
+        currency: 'USD'
+    });
+}
+
 export const prettifyString = (input: string): string => {
     return input
         .split('_')

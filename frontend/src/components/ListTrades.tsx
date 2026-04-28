@@ -1,15 +1,17 @@
-import { useState } from "react";
-import { formatDateTime, prettifyString } from "../utils/formatUtils";
+import { useEffect, useState } from "react";
+import { formatDateTime, prettifyString, formatPrice, formatQuantity } from "../utils/formatUtils";
 import api from "../utils/api";
 import { enqueueSnackbar } from "notistack";
-import type { Trade } from "../utils/types";
 
 
 const listTrades = ({ fetchTrades, openTrades, closedTrades}) => {
 
     const [showOpenTrades, setShowOpenTrades] = useState<boolean>(true);
-    // const [openTrades, setOpenTrades] = useState<Trade[]>([]);
-    // const [closedTrades, setClosedTrades] = useState<Trade[]>([]);
+
+
+    useEffect(() => {
+        fetchTrades();
+    }, [showOpenTrades]);
 
 
     const closeTrade = (tradeId : number, tradeSide: string) => {
@@ -28,7 +30,7 @@ const listTrades = ({ fetchTrades, openTrades, closedTrades}) => {
                 enqueueSnackbar('Error while closing trade', {variant: "error"});
             });
         } else {
-            
+
             api.post(`trade/close/short/${tradeId}`)
             .then((response) => {
                 fetchTrades();
@@ -46,14 +48,14 @@ const listTrades = ({ fetchTrades, openTrades, closedTrades}) => {
         <div className="flex flex-col gap-2">
             <div className="flex flex-row gap-4 text-sm">
                 <button
-                    className={`px-4 py-2 text-white hover:cursor-pointer ${showOpenTrades === true ? 'border-b-2 border-gray-700 bg-yellow-500' : 'bg-yellow-500'}`}
+                    className={`px-4 py-2 text-white hover:cursor-pointer _rounded-sm border border-gray-700 ${showOpenTrades === true ? 'border-b-2 bg-yellow-500' : 'bg-yellow-500'}`}
                     type="button"
                     onClick={() => setShowOpenTrades(true)}
                 >
                     Open
                 </button>
                 <button
-                    className={`px-4 py-2 text-white hover:cursor-pointer ${showOpenTrades === false ? 'border-b-2 border-gray-700 bg-yellow-500' : 'bg-yellow-500'}`}
+                    className={`px-4 py-2 text-white hover:cursor-pointer _rounded-sm border border-gray-700 ${showOpenTrades === false ? 'border-b-2 bg-yellow-500' : 'bg-yellow-500'}`}
                     type="button"
                     onClick={() => setShowOpenTrades(false)}
                 >
@@ -86,9 +88,9 @@ const listTrades = ({ fetchTrades, openTrades, closedTrades}) => {
                                     >
                                         <td className="px-2 py-2 text-left">{trade.instrument.base_asset}</td>
                                         <td className="px-2 py-2 text-left">{prettifyString(trade.side)}</td>
-                                        <td className="px-2 py-2 text-left">{trade.entry_price}</td>
+                                        <td className="px-2 py-2 text-left">{formatPrice(trade.entry_price)}</td>
                                         <td className="px-2 py-2 text-left">{formatDateTime(trade.entry_time)}</td>
-                                        <td className="px-2 py-2 text-left">{trade.quantity}</td>
+                                        <td className="px-2 py-2 text-left">{formatQuantity(trade.quantity)}</td>
                                         <td className="px-2 py-2 text-left">
                                             <button 
                                                 type="button" 
@@ -129,10 +131,10 @@ const listTrades = ({ fetchTrades, openTrades, closedTrades}) => {
                                     >
                                         <td className="px-2 py-2 text-left">{trade.instrument.base_asset}</td>
                                         <td className="px-2 py-2 text-left">{prettifyString(trade.side)}</td>
-                                        <td className="px-2 py-2 text-left">{trade.entry_price}</td>
+                                        <td className="px-2 py-2 text-left">{formatPrice(trade.entry_price)}</td>
                                         <td className="px-2 py-2 text-left">{formatDateTime(trade.entry_time)}</td>
-                                        <td className="px-2 py-2 text-left">{trade.quantity}</td>
-                                        <td className="px-2 py-2 text-left">{trade.exit_price}</td>
+                                        <td className="px-2 py-2 text-left">{formatQuantity(trade.quantity)}</td>
+                                        <td className="px-2 py-2 text-left">{formatPrice(trade.exit_price)}</td>
                                         <td className="px-2 py-2 text-left">{formatDateTime(trade.exit_time)}</td>
                                     </tr>
                                 ))}
