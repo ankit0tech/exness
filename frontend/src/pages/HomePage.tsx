@@ -1,5 +1,5 @@
 import axios from "axios";
-import { AreaSeries, BarSeries, BaselineSeries, CandlestickSeries, createChart } from "lightweight-charts";
+import { AreaSeries, CandlestickSeries, createChart } from "lightweight-charts";
 import type { UTCTimestamp } from 'lightweight-charts';
 
 // import { eventNames } from "process";
@@ -17,9 +17,6 @@ const HomePage = () => {
     const chartRef = useRef<HTMLDivElement|null>(null);
     const backendWebSocketurl = "ws://localhost:3000";
     const historicAPI = "https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1m&limit=30"
-
-    const usermail = localStorage.getItem("email") || "";
-
 
     useEffect(() => {
         if(!chartRef.current) return;

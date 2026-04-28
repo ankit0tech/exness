@@ -4,7 +4,6 @@ import { useRef, useState } from "react";
 import { AiOutlineUser } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
 import { useClickOutside } from "../hooks/useClickOutside";
-import { HiHome } from "react-icons/hi";
 import { FaHome } from "react-icons/fa";
 
 

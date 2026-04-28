@@ -27,3 +27,16 @@ export type Trade = {
         symbol: string;
     };
 };
+
+export type Account = {
+    id: number;
+    user_id: number;
+    balance: string;
+    free_margin: string;
+    used_margin: string;
+    currency: string
+
+    created_at: Date;
+    updated_at: Date;
+
+}

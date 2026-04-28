@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import api from '../utils/api';
 import { enqueueSnackbar } from 'notistack';
 import { formatPrice } from '../utils/formatUtils';
+import type { Account } from '../utils/types';
 
 const AccountDetails = () => {
 
-    const [accountDetails, setAccountDetails] = useState(null);
+    const [accountDetails, setAccountDetails] = useState<Account|null>(null);
     const [amount, setAmount] = useState(0);
     
     useEffect(() => {
