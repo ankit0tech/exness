@@ -15,14 +15,12 @@ const listTrades = ({ fetchTrades, openTrades, closedTrades}) => {
 
 
     const closeTrade = (tradeId : number, tradeSide: string) => {
-        console.log("Closing trade: ", tradeId, tradeSide);
 
         if(tradeSide.toUpperCase() === 'LONG') {
 
             api.post(`trade/close/long/${tradeId}`)
-            .then((response) => {
+            .then((_response) => {
                 fetchTrades();
-                console.log(response);
                 enqueueSnackbar('Trade closed successfully', {variant: "success"});
             })
             .catch((error: any) => {
@@ -32,9 +30,8 @@ const listTrades = ({ fetchTrades, openTrades, closedTrades}) => {
         } else {
 
             api.post(`trade/close/short/${tradeId}`)
-            .then((response) => {
+            .then((_response) => {
                 fetchTrades();
-                console.log(response);
                 enqueueSnackbar('Trade closed successfully', {variant: "success"});
             })
             .catch((error: any) => {

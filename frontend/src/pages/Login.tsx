@@ -14,10 +14,6 @@ interface JwtPayload {
 
 const Login = () => {
 
-    // const onClick = () => {
-    //     console.log('button clicked');
-    // }
-
     const navigate = useNavigate();
 
     const login = useGoogleLogin({
@@ -54,7 +50,7 @@ const Login = () => {
 
 
     return (
-        <div className="flex flex-col w-full min-w-[320px] items-center">
+        <div className="flex flex-col w-full min-w-[320px] items-center p-4">
             <Button onClick={login} >
                 Login with google
             </Button>

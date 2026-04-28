@@ -128,4 +128,40 @@ router.get('/details', authMiddleware, async (req: Request, res: Response) => {
     }
 });
 
+
+router.post('/create', authMiddleware, async (req: Request, res: Response) => {
+    try {
+        console.log("CREATE");
+        const userId = req.userId;
+
+        if(userId === undefined) {
+            return res.status(401).json({ message: "Issue with authentication" });
+        }
+
+        const account = await prisma.account.create({
+            data: {
+                user_id: userId,
+                balance: 0,
+                used_margin: 0,
+                free_margin: 0,
+                currency: "USD"
+            }
+        });
+
+        if(!account) {
+            return res.status(400).json({ message: "Error while creating account" });
+        } else {
+            return res.status(200).json({ message: "Account created successfully"});
+        }
+
+    } catch(error: any) {
+        if(error instanceof ApiError) {
+            return res.status(error.status).json({ message: error.message });
+        }
+
+        console.log("error:", error);
+        return res.status(500).json({message: "An unexpected error occurred. Please try again later."});
+    }
+});
+
 export default router;
