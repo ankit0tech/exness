@@ -86,10 +86,10 @@ model instrument {
   base_asset      String // BTC, EUR, XAU
   quote_currency  Currency @default(USD)
   
-  max_leverage   Int
+  max_leverage   BigInt
   min_quantity   BigInt @default(1)
   is_active      Boolean @default(true)
-  fees_per_unit  Int @default(0)
+  fees_per_unit  BigInt @default(0)
 
   trades        trade[]
 
@@ -114,7 +114,7 @@ model trade {
   status        TradeStatus @default(OPEN)
 
   quantity      BigInt
-  leverage      Int
+  leverage      BigInt
   entry_price   BigInt 
   entry_time    DateTime @default(now())
   notional      BigInt
