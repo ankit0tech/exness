@@ -27,7 +27,7 @@ class ApiError extends Error {
     }
 }
 
-router.post('/create/buy', authMiddleware, async (req: Request, res: Response) => {
+router.post('/create/long', authMiddleware, async (req: Request, res: Response) => {
     
     try {
         const userId = req.userId;
@@ -159,7 +159,7 @@ router.post('/create/buy', authMiddleware, async (req: Request, res: Response) =
     }
 });
 
-router.post('/close/sell/:id', authMiddleware, async (req: Request, res: Response) => {
+router.post('/close/long/:id', authMiddleware, async (req: Request, res: Response) => {
     try {
         const id = Number(req.params.id);
 
@@ -190,7 +190,7 @@ router.post('/close/sell/:id', authMiddleware, async (req: Request, res: Respons
                 where: {
                     id: Number(id),
                     user_id: userId,
-                    side: "SHORT"
+                    side: "LONG"
                 }
             });
 
@@ -246,7 +246,7 @@ router.post('/close/sell/:id', authMiddleware, async (req: Request, res: Respons
     }
 });
 
-router.post('/create/sell', authMiddleware, async (req: Request, res: Response) => {
+router.post('/create/short', authMiddleware, async (req: Request, res: Response) => {
     try {
         const userId = req.userId;
         if(userId === undefined) {
@@ -375,8 +375,9 @@ router.post('/create/sell', authMiddleware, async (req: Request, res: Response) 
     }
 });
 
-router.post('/close/buy/:id', authMiddleware, async (req: Request, res: Response) => {
+router.post('/close/short/:id', authMiddleware, async (req: Request, res: Response) => {
     try {
+        console.log(req.params.id);
         const id = Number(req.params.id);
 
         if (!Number.isInteger(id) || id <= 0) {
