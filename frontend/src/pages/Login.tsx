@@ -4,6 +4,7 @@ import api from "../utils/api";
 import { jwtDecode } from "jwt-decode";
 import { enqueueSnackbar } from "notistack";
 import { useNavigate } from "react-router-dom";
+import tradingImg from "../assets/trading.png";
 
 
 interface JwtPayload {
@@ -50,10 +51,20 @@ const Login = () => {
 
 
     return (
-        <div className="flex flex-col w-full min-w-[320px] items-center p-4">
+        <div className="flex flex-col gap-4 w-full min-w-[320px] items-center p-4">
+
+            <div className="mx-auto text-md text-gray-900">Start your trading journey today</div>
+
             <Button onClick={login} >
                 Login with google
             </Button>
+
+            <img 
+                src={tradingImg} 
+                alt="Trading illustrations" 
+                className="w-full max-w-4xl h-auto object-contain border border-gray-300 rounded-md"    
+            />
+
         </div>
     );
 }
