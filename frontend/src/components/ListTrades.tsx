@@ -92,7 +92,7 @@ const listTrades = ({ fetchTrades, openTrades, closedTrades}) => {
                                         <td className="px-3 py-2 text-center">
                                             <button 
                                                 type="button" 
-                                                className="cursor-pointer rounded-sm border border-gray-300 px-3 py-1.5 text-sm text-gray-700 transition-colors duration-200 hover:bg-gray-100 active:scale-95" 
+                                                className="cursor-pointer rounded-sm border border-gray-300 px-3 py-1.5 text-sm text-gray-700 transition-colors transition-transform duration-200 hover:bg-gray-100 active:scale-95" 
                                                 onClick={() => {closeTrade(trade.id, trade.side)}}
                                             >
                                                 close
