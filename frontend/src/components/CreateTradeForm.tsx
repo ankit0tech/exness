@@ -49,21 +49,20 @@ const CreateTradeForm = ({ fetchTrades }) => {
                 enqueueSnackbar('Failed to open sell trade', {variant: "error"});
             });
         }
-
     }
 
 
     return (
-        <div className="flex flex-col gap-2 min-w-[200px]">
+        <div className="flex flex-col gap-2 min-w-[200px] rounded-lg border border-gray-300 shadow-xs p-4">
             <div className="flex flex-row gap-1 w-full items-stretch">
                 <button
-                    className={`hover:cursor-pointer w-full text-sm px-6 py-2 border border-black border-blue-600 _rounded-md ${tradeLong ? 'bg-blue-600 text-white' : 'bg-white text-blue-700'}`}
+                    className={`rounded-sm hover:cursor-pointer w-full text-sm px-6 py-2 border rounded-md ${tradeLong ? 'border-[hsla(209,95%,53%,1)] bg-[hsla(209,95%,53%,1)] text-white' : 'border-[hsla(209,95%,53%,0.7)] text-[hsla(209,95%,53%,1)] bg-white'}`}
                     onClick={() => setTradeLong(true)}
                 >
                     Buy
                 </button>
                 <button
-                    className={`hover:cursor-pointer w-full text-sm px-6 py-2 border border-black border-red-600 _rounded-md ${tradeLong ? 'bg-white text-red-500' : 'bg-red-500 text-white'}`}
+                    className={`hover:cursor-pointer w-full text-sm px-6 py-2 border border-black border-red-600 rounded-md ${tradeLong ? 'border-[hsla(3,81%,58%,0.7)] text-[hsla(3,81%,58%,1)] bg-white' : 'border-[hsla(3,81%,58%,1)] bg-[hsla(3,81%,58%,1)] text-white'}`}
                     onClick={() => setTradeLong(false)}
                 >
                     Sell
@@ -71,7 +70,7 @@ const CreateTradeForm = ({ fetchTrades }) => {
             </div>
 
             <form 
-                className="text-sm flex flex-col gap-2 border rounded-lg p-4 max-w-[320px]"
+                className="text-sm flex flex-col gap-2 border border-gray-300 rounded-lg p-4 max-w-[320px]"
                 onSubmit={(e) => handleSubmit(e)} 
             >
                 <div className="flex flex-col gap-1">
@@ -82,7 +81,7 @@ const CreateTradeForm = ({ fetchTrades }) => {
                     </label>
                     <select 
                         id="instrument"
-                        className="border border-gray-500 hover:border-gray-700 active:border-gray-700 rounded-sm outline-hidden py-2 px-4 transition-colors duration-200"
+                        className="border border-gray-300 hover:border-gray-400 active:border-gray-400 rounded-sm outline-hidden py-2 px-4 transition-colors duration-200"
                         value={instrument}
                         defaultValue={"BTCUSD"}
                         onChange={(e) => setInstrument(e.target.value)}
@@ -98,7 +97,7 @@ const CreateTradeForm = ({ fetchTrades }) => {
                         Volume(lot)
                     </label>
 
-                    <div className="flex items-stretch border border-gray-500 hover:border-gray-700 active:border-gray-700 rounded-sm overflow-hidden">
+                    <div className="flex items-stretch border border-gray-300 hover:border-gray-400 active:border-gray-400 rounded-sm overflow-hidden">
                         <input
                             id="quantity"
                             type="number"
@@ -111,7 +110,7 @@ const CreateTradeForm = ({ fetchTrades }) => {
 
                         <button
                             type="button"
-                            className="text-gray-600 border-x border-gray-500 px-4 _bg-gray-50 hover:bg-gray-100"
+                            className="text-gray-600 border-x border-gray-300 px-4 _bg-gray-50 hover:bg-gray-100"
                             onClick={() => setQuantity((q) => Math.max(0, Number((q - 0.01).toFixed(2))))}
                         >
                             -
@@ -133,7 +132,7 @@ const CreateTradeForm = ({ fetchTrades }) => {
                     >
                         Leverage
                     </label>
-                    <div className="flex items-stretch border border-gray-500 hover:border-gray-700 active:border-gray-700 rounded-sm overflow-hidden">
+                    <div className="flex items-stretch border border-gray-300 hover:border-gray-400 active:border-gray-400 rounded-sm overflow-hidden">
                         <input
                             id="leverage"
                             type="number"
@@ -146,7 +145,7 @@ const CreateTradeForm = ({ fetchTrades }) => {
                     
                         <button
                             type="button"
-                            className="text-gray-600 border-x border-gray-500 hover:border-gray-700 active:border-gray-700 px-4 _bg-gray-50 hover:bg-gray-100"
+                            className="text-gray-600 border-x border-gray-300 hover:border-gray-400 active:border-gray-400 px-4 _bg-gray-50 hover:bg-gray-100"
                             onClick={() => setLeverage((q) => Math.max(0, q - 1))}
                         >
                             -
@@ -164,7 +163,7 @@ const CreateTradeForm = ({ fetchTrades }) => {
 
                 <button
                     type='submit'
-                    className={`cursor-pointer text-sm border rounded-sm outline-hidden text-white py-2 px-4 active:scale-98 transition-transform transition-colors duration-300 ${tradeLong ? 'bg-blue-600 text-white border-blue-800' : 'bg-red-600 text-white border-red-800'}`}
+                    className={`cursor-pointer text-sm border rounded-sm outline-hidden text-white py-2 px-4 active:scale-98 transition-transform transition-colors duration-300 ${tradeLong ? 'border-[hsla(209,95%,53%,1)] bg-[hsla(209,95%,53%,1)] text-white' : 'border-[hsla(3,81%,58%,1)] bg-[hsla(3,81%,58%,1)] text-white'}`}
                 >
                     { tradeLong ? 'Confirm Buy' : 'Confirm Sell' }
                 </button>

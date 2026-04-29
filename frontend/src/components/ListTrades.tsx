@@ -43,16 +43,16 @@ const listTrades = ({ fetchTrades, openTrades, closedTrades}) => {
 
     return (
         <div className="flex flex-col gap-2">
-            <div className="flex flex-row gap-4 text-sm">
+            <div className="inline-flex gap-2 w-fit rounded-md border border-gray-200 bg-gray-50 p-1 text-sm">
                 <button
-                    className={`px-4 py-2 text-white hover:cursor-pointer _rounded-sm border border-gray-700 ${showOpenTrades === true ? 'border-b-2 bg-yellow-500' : 'bg-yellow-500'}`}
+                    className={`cursor-pointer rounded-sm px-4 py-1.5 font-medium transition-colors duration-200 ${showOpenTrades ? 'bg-white text-gray-700 shadow-sm' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-800'}`}
                     type="button"
                     onClick={() => setShowOpenTrades(true)}
                 >
                     Open
                 </button>
                 <button
-                    className={`px-4 py-2 text-white hover:cursor-pointer _rounded-sm border border-gray-700 ${showOpenTrades === false ? 'border-b-2 bg-yellow-500' : 'bg-yellow-500'}`}
+                    className={`cursor-pointer rounded-sm px-4 py-1.5 font-medium transition-colors duration-200 ${!showOpenTrades ? 'bg-white text-gray-700 shadow-sm' : 'text-gray-600 hover:bg-gray-100 hover:text-gray-800'}`}
                     type="button"
                     onClick={() => setShowOpenTrades(false)}
                 >
@@ -66,32 +66,33 @@ const listTrades = ({ fetchTrades, openTrades, closedTrades}) => {
                     openTrades.length === 0 ? (
                         <div className="text-gray-700">No Open trades till now</div>
                         ):(
-                        <table className="table-fixed w-full border rounded-sm">
-                            <thead className="w-full p-2 font-medium">
-                                <tr className="w-full p-2">
-                                    <th className="px-2 py-2 text-left">Asset</th>
-                                    <th className="px-2 py-2 text-left">Trade Type</th>
-                                    <th className="px-2 py-2 text-left">Entry Price</th>
-                                    <th className="px-2 py-2 text-left">Entry Time</th>
-                                    <th className="px-2 py-2 text-left">Quantity</th>
-                                    <th className="px-2 py-2 text-left">Action</th>
+                        <div className="overflow-x-auto rounded-md border border-gray-200">
+                        <table className="w-full min-w-[760px] table-auto">
+                            <thead className="bg-gray-50 text-gray-700">
+                                <tr className="border-b border-gray-200">
+                                    <th className="px-3 py-2 text-left font-semibold">Asset</th>
+                                    <th className="px-3 py-2 text-left font-semibold">Trade Type</th>
+                                    <th className="px-3 py-2 text-right font-semibold">Entry Price</th>
+                                    <th className="px-3 py-2 text-left font-semibold">Entry Time</th>
+                                    <th className="px-3 py-2 text-right font-semibold">Quantity</th>
+                                    <th className="px-3 py-2 text-center font-semibold">Action</th>
                                 </tr>
                             </thead>
-                            <tbody className="w-full border p-2">
+                            <tbody className="bg-white">
                                 {openTrades.map((trade: any) => (
                                     <tr 
                                         key={trade.id}
-                                        className="w-full p-2"
+                                        className="border-b border-gray-100 last:border-b-0"
                                     >
-                                        <td className="px-2 py-2 text-left">{trade.instrument.base_asset}</td>
-                                        <td className="px-2 py-2 text-left">{prettifyString(trade.side)}</td>
-                                        <td className="px-2 py-2 text-left">{formatPrice(trade.entry_price)}</td>
-                                        <td className="px-2 py-2 text-left">{formatDateTime(trade.entry_time)}</td>
-                                        <td className="px-2 py-2 text-left">{formatQuantity(trade.quantity)}</td>
-                                        <td className="px-2 py-2 text-left">
+                                        <td className="px-3 py-2 text-left">{trade.instrument.base_asset}</td>
+                                        <td className="px-3 py-2 text-left">{prettifyString(trade.side)}</td>
+                                        <td className="px-3 py-2 text-right tabular-nums whitespace-nowrap">{formatPrice(trade.entry_price)}</td>
+                                        <td className="px-3 py-2 text-left whitespace-nowrap text-gray-600">{formatDateTime(trade.entry_time)}</td>
+                                        <td className="px-3 py-2 text-right tabular-nums whitespace-nowrap">{formatQuantity(trade.quantity)}</td>
+                                        <td className="px-3 py-2 text-center">
                                             <button 
                                                 type="button" 
-                                                className="px-2 py-2 text-left hover:cursor-pointer active:scale-95 border rounded-sm hover:bg-stone-100 transition-transform transition-colors duration-300" 
+                                                className="cursor-pointer rounded-sm border border-gray-300 px-3 py-1.5 text-sm text-gray-700 transition-colors duration-200 hover:bg-gray-100 active:scale-95" 
                                                 onClick={() => {closeTrade(trade.id, trade.side)}}
                                             >
                                                 close
@@ -101,6 +102,7 @@ const listTrades = ({ fetchTrades, openTrades, closedTrades}) => {
                                 ))}
                             </tbody>
                         </table>
+                        </div>
                     )}
                 </div>
             ) : (
@@ -108,35 +110,39 @@ const listTrades = ({ fetchTrades, openTrades, closedTrades}) => {
                     {closedTrades.length === 0 ? (
                         <div className="text-gray-700">No closed trades till now</div>
                     ):(
-                        <table className="table-fixed w-full border rounded-sm">
-                            <thead className="w-full p-2 font-medium">
-                                <tr className="w-full p-2">
-                                    <th className="px-2 py-2 text-left">Asset</th>
-                                    <th className="px-2 py-2 text-left">Trade Type</th>
-                                    <th className="px-2 py-2 text-left">Entry Price</th>
-                                    <th className="px-2 py-2 text-left">Entry Time</th>
-                                    <th className="px-2 py-2 text-left">Quantity</th>
-                                    <th className="px-2 py-2 text-left">Exit Price</th>
-                                    <th className="px-2 py-2 text-left">Exit Time</th>
+                        <div className="overflow-x-auto rounded-md border border-gray-200">
+                        <table className="w-full min-w-[980px] table-auto">
+                            <thead className="bg-gray-50 text-gray-700">
+                                <tr className="border-b border-gray-200">
+                                    <th className="px-3 py-2 text-left font-semibold">Asset</th>
+                                    <th className="px-3 py-2 text-left font-semibold">Trade Type</th>
+                                    <th className="px-3 py-2 text-right font-semibold">Entry Price</th>
+                                    <th className="px-3 py-2 text-left font-semibold">Entry Time</th>
+                                    <th className="px-3 py-2 text-right font-semibold">Quantity</th>
+                                    <th className="px-3 py-2 text-right font-semibold">PnL</th>
+                                    <th className="px-3 py-2 text-right font-semibold">Exit Price</th>
+                                    <th className="px-3 py-2 text-left font-semibold">Exit Time</th>
                                 </tr>
                             </thead>
-                            <tbody className="w-full border p-2">
+                            <tbody className="bg-white">
                                 {closedTrades.map((trade: any) => (
                                     <tr 
                                         key={trade.id}
-                                        className="w-full p-2"
+                                        className="border-b border-gray-100 last:border-b-0"
                                     >
-                                        <td className="px-2 py-2 text-left">{trade.instrument.base_asset}</td>
-                                        <td className="px-2 py-2 text-left">{prettifyString(trade.side)}</td>
-                                        <td className="px-2 py-2 text-left">{formatPrice(trade.entry_price)}</td>
-                                        <td className="px-2 py-2 text-left">{formatDateTime(trade.entry_time)}</td>
-                                        <td className="px-2 py-2 text-left">{formatQuantity(trade.quantity)}</td>
-                                        <td className="px-2 py-2 text-left">{formatPrice(trade.exit_price)}</td>
-                                        <td className="px-2 py-2 text-left">{formatDateTime(trade.exit_time)}</td>
+                                        <td className="px-3 py-2 text-left">{trade.instrument.base_asset}</td>
+                                        <td className="px-3 py-2 text-left">{prettifyString(trade.side)}</td>
+                                        <td className="px-3 py-2 text-right tabular-nums whitespace-nowrap">{formatPrice(trade.entry_price)}</td>
+                                        <td className="px-3 py-2 text-left whitespace-nowrap text-gray-600">{formatDateTime(trade.entry_time)}</td>
+                                        <td className="px-3 py-2 text-right tabular-nums whitespace-nowrap">{formatQuantity(trade.quantity)}</td>
+                                        <td className="px-3 py-2 text-right tabular-nums whitespace-nowrap">{formatPrice(trade.realized_pnl)}</td>
+                                        <td className="px-3 py-2 text-right tabular-nums whitespace-nowrap">{formatPrice(trade.exit_price)}</td>
+                                        <td className="px-3 py-2 text-left whitespace-nowrap text-gray-600">{formatDateTime(trade.exit_time)}</td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
+                        </div>
                     )}
                 </div>
             )}

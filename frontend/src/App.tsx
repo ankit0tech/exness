@@ -12,7 +12,7 @@ function App() {
   return (
     <div className='h-full w-full'>
       <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-        <div className='shrink-0'>
+        <div className='sticky top-0 z-40 bg-white'>
           <NavBar />
         </div>
 

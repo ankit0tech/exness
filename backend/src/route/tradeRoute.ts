@@ -373,7 +373,6 @@ router.post('/create/short', authMiddleware, async (req: Request, res: Response)
 
 router.post('/close/short/:id', authMiddleware, async (req: Request, res: Response) => {
     try {
-        console.log(req.params.id);
         const id = Number(req.params.id);
 
         if (!Number.isInteger(id) || id <= 0) {

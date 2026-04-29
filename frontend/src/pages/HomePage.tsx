@@ -155,12 +155,9 @@ const HomePage = () => {
 
     return (
         <div className="flex flex-col gap-4 p-4">
-            {/* <div className="text-sm text-gray-800">
-                {usermail}
-            </div> */}
 
             <div className="flex flex-row gap-2">
-                <div className="w-full ring ring-gray-700 rounded-sm p-4">
+                <div className="w-full ring ring-gray-300 rounded-md shadow-sm p-4">
                     <div 
                         className="w-full h-[480px]"
                         ref={chartRef} 

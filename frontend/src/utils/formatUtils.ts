@@ -1,34 +1,56 @@
+const SATS_PER_BTC_DECIMALS = 8;
 
+const normalizeSignedIntegerString = (value: string): { negative: boolean; digits: string } | null => {
+    if (!value) return null;
+
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+
+    const negative = trimmed.startsWith("-");
+    const unsigned = negative ? trimmed.slice(1) : trimmed;
+
+    if (!/^\d+$/.test(unsigned)) return null;
+
+    const digits = unsigned.replace(/^0+/, "") || "0";
+    return { negative, digits };
+};
+
+const addThousandsSeparators = (digits: string): string => {
+    return digits.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
 
 export const formatQuantity = (input: string): string => {
-    const STATS_PER_BTC = 8;
-
-    if(!input || input === "0") {
+    const parsed = normalizeSignedIntegerString(input);
+    if (!parsed || parsed.digits === "0") {
         return "0";
     }
 
-    const padded = input.padStart(STATS_PER_BTC+1, "0");
-    const whole  = padded.slice(0, -STATS_PER_BTC);
-    const frac = padded.slice(-STATS_PER_BTC);
-    const fracTrimmed = frac.replace(/0+$/, "");
+    const padded = parsed.digits.padStart(SATS_PER_BTC_DECIMALS + 1, "0");
+    const wholeRaw = padded.slice(0, -SATS_PER_BTC_DECIMALS);
+    const fractionRaw = padded.slice(-SATS_PER_BTC_DECIMALS);
+    const fractionTrimmed = fractionRaw.replace(/0+$/, "");
+    const whole = wholeRaw.replace(/^0+/, "") || "0";
+    const sign = parsed.negative ? "-" : "";
 
-    const result = fracTrimmed ? `${whole}.${fracTrimmed}` : whole;
-
-    return result;
-}
+    return fractionTrimmed ? `${sign}${whole}.${fractionTrimmed}` : `${sign}${whole}`;
+};
 
 export const formatPrice = (input: string): string => {
-    
-    if(!input || input === "0") {
-        return "0";
+    const parsed = normalizeSignedIntegerString(input);
+    if (!parsed || parsed.digits === "0") {
+        return "$0.00";
     }
 
-    input = input.slice(0, -4);
-    input = input.slice(0, -2) + "." + input.slice(-2);
-    return Number(input).toLocaleString('en-US', {
-        style: 'currency',
-        currency: 'USD'
-    });
+    const sign = parsed.negative ? "-" : "";
+    const microValue = BigInt(parsed.digits);
+
+    // Convert micro-USD to cents with round-half-up to avoid truncation drift.
+    const cents = (microValue + 5_000n) / 10_000n;
+    const dollars = cents / 100n;
+    const centPart = (cents % 100n).toString().padStart(2, "0");
+    const dollarsFormatted = addThousandsSeparators(dollars.toString());
+
+    return `${sign}$${dollarsFormatted}.${centPart}`;
 }
 
 export const prettifyString = (input: string): string => {
