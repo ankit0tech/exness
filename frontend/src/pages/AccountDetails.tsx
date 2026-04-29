@@ -63,32 +63,38 @@ const AccountDetails = () => {
 
     
     return (
-        <div className='w-full max-w-[520px] p-4'>
+        <div className='mx-auto w-full max-w-[580px] p-4'>
             {!accountDetails ? (
-                <section className='mx-auto flex w-full flex-col gap-4 rounded-md border border-gray-300 bg-gray-100 p-4 text-center'>
-                    <h2 className='text-base font-medium text-gray-800'>No account found</h2>
+                <div className='mx-auto flex w-full flex-col gap-4 rounded-xl border border-gray-300 bg-gray-100 p-5 text-center shadow-sm'>
+                    <h1 className='text-lg font-semibold text-gray-800'>Account Details</h1>
+                    <p className='text-sm text-gray-600'>No account found for this user yet.</p>
                     <button
                         type="button"
                         onClick={createAccount}
-                        className="mx-auto w-fit px-4 py-2 text-white bg-yellow-500 cursor-pointer border border-gray-800 active:scale-98 transition-transform duration-300"
+                        className='mx-auto w-fit cursor-pointer rounded-md border border-[hsla(209,95%,53%,1)] bg-[hsla(209,95%,53%,1)] px-4 py-2 text-sm font-medium text-white transition-transform transition-colors duration-300 active:scale-98'
                     >
                         Create empty account
                     </button>
-                </section>
+                </div>
             ) : (
-                <section className='flex w-full flex-col gap-4 rounded-md border border-gray-300 bg-gray-100 p-4 shadow-sm'>
+                <div className='flex w-full flex-col gap-5 rounded-xl border border-gray-300 bg-gray-100 p-5 shadow-sm'>
+                    <div className='flex items-center justify-between gap-2'>
+                        <h1 className='text-lg font-semibold text-gray-800'>Account Details</h1>
+                        <span className='rounded-full border border-gray-300 bg-white px-2.5 py-1 text-xs text-gray-600'>USD Wallet</span>
+                    </div>
+
                     <div className='w-full'>
-                        <h2 className='mb-2 text-base font-medium text-gray-800'>Account Overview</h2>
+                        <h2 className='mb-2 text-sm font-semibold uppercase tracking-wide text-gray-600'>Account Overview</h2>
                         <dl className='flex w-full flex-col gap-2 text-sm'>
-                            <div className='flex items-center justify-between rounded-md border border-gray-300 bg-white p-3'>
+                            <div className='flex items-center justify-between rounded-md border border-gray-300 bg-white px-4 py-3'>
                                 <dt className='text-gray-600 font-medium'>Balance</dt>
                                 <dd className='font-medium tabular-nums'>{formatPrice(accountDetails.balance)}</dd>
                             </div>
-                            <div className='flex items-center justify-between rounded-md border border-gray-300 bg-white p-3'>
+                            <div className='flex items-center justify-between rounded-md border border-gray-300 bg-white px-4 py-3'>
                                 <dt className='text-gray-600 font-medium'>Used Margin</dt>
                                 <dd className='font-medium tabular-nums'>{formatPrice(accountDetails.used_margin)}</dd>
                             </div>
-                            <div className='flex items-center justify-between rounded-md border border-gray-300 bg-white p-3'>
+                            <div className='flex items-center justify-between rounded-md border border-gray-300 bg-white px-4 py-3'>
                                 <dt className='text-gray-600 font-medium'>Free Margin</dt>
                                 <dd className='font-medium tabular-nums'>{formatPrice(accountDetails.free_margin)}</dd>
                             </div>
@@ -96,7 +102,7 @@ const AccountDetails = () => {
                     </div>
 
                     <form 
-                        className="flex flex-col gap-4 rounded-sm border border-gray-300 bg-white p-3"
+                        className="flex flex-col gap-4 rounded-md border border-gray-300 bg-white p-4"
                         onSubmit={(e) => {updateBalance(e)}}
                     >
                         <div className='flex flex-col gap-2'>
@@ -108,7 +114,7 @@ const AccountDetails = () => {
                             </label>
                             <input 
                                 id="amount"
-                                className="px-4 py-2 rounded-sm border border-gray-300 outline-hidden"
+                                className="h-10 rounded-md border border-gray-300 px-3 outline-hidden"
                                 type="number"
                                 value={amount}
                                 onChange={(e) => setAmount(Number(e.target.value))}
@@ -118,12 +124,12 @@ const AccountDetails = () => {
                         <button
                             type="submit"
                             disabled={amount === 0}
-                            className='self-end w-fit cursor-pointer text-sm font-medium border rounded-sm outline-hidden text-white py-2 px-4 active:scale-98 transition-transform transition-colors duration-300 border-[hsla(209,95%,53%,1)] bg-[hsla(209,95%,53%,1)] text-white'
+                            className='self-end w-fit cursor-pointer rounded-md border border-[hsla(209,95%,53%,1)] bg-[hsla(209,95%,53%,1)] px-4 py-2 text-sm font-medium text-white transition-transform transition-colors duration-300 active:scale-98 disabled:cursor-not-allowed disabled:opacity-70'
                         >
                             Update Balance
                         </button>
                     </form>
-                </section>
+                </div>
             )}
         </div>
     );

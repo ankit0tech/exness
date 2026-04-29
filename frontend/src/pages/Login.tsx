@@ -52,12 +52,21 @@ const Login = () => {
 
     return (
         <div className="flex flex-col gap-4 w-full min-w-[320px] items-center p-4">
+            
+            <div>
+                <h1 className="text-2xl font-semibold text-gray-900">Welcome back</h1>
+                <p className="mt-2 text-sm text-gray-600">
+                    Start your trading journey today.
+                </p>
+            </div>
 
-            <div className="mx-auto text-md text-gray-900">Start your trading journey today</div>
-
-            <Button onClick={login} >
-                Login with google
-            </Button>
+            <div className="">
+                <Button 
+                    onClick={login} 
+                >
+                    Login with google
+                </Button>
+            </div>
 
             <img 
                 src={tradingImg} 

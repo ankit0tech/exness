@@ -6,7 +6,8 @@ const Button = ({onClick, children}: {onClick: () => void, children: string}) =>
         <button 
             type='button' 
             onClick={onClick}
-            className="mx-auto w-fit px-4 py-2 text-white bg-yellow-500 cursor-pointer border border-gray-800 active:scale-98 transition-transform duration-300"        >
+            className='w-fit cursor-pointer text-sm font-medium border rounded-sm outline-hidden text-white py-2 px-4 active:scale-98 transition-transform transition-colors duration-300 border-[hsla(209,95%,53%,1)] bg-[hsla(209,95%,53%,1)] text-white'
+        >
             {children}
         </button>
     );
