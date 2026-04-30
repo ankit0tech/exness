@@ -65,7 +65,7 @@ const AccountDetails = () => {
     return (
         <div className='mx-auto w-full max-w-[580px] p-4'>
             {!accountDetails ? (
-                <div className='mx-auto flex w-full flex-col gap-4 rounded-xl border border-gray-300 bg-gray-100 p-5 text-center shadow-sm'>
+                <div className='mx-auto flex w-full flex-col gap-4 rounded-xl border border-gray-300 bg-gray-500 p-5 text-center shadow-xs'>
                     <h1 className='text-lg font-semibold text-gray-800'>Account Details</h1>
                     <p className='text-sm text-gray-600'>No account found for this user yet.</p>
                     <button
@@ -77,7 +77,7 @@ const AccountDetails = () => {
                     </button>
                 </div>
             ) : (
-                <div className='flex w-full flex-col gap-5 rounded-xl border border-gray-300 bg-gray-100 p-5 shadow-sm'>
+                <div className='flex w-full flex-col gap-5 rounded-xl border border-gray-300 bg-gray-50 p-5 shadow-xs'>
                     <div className='flex items-center justify-between gap-2'>
                         <h1 className='text-lg font-semibold text-gray-800'>Account Details</h1>
                         <span className='rounded-full border border-gray-300 bg-white px-2.5 py-1 text-xs text-gray-600'>USD Wallet</span>

@@ -1,13 +1,13 @@
 import { useState } from "react";
 import api from "../utils/api";
 import { enqueueSnackbar } from "notistack";
+import { instruments } from "../utils/types.js";
 
-const CreateTradeForm = ({ fetchTrades }) => {
+const CreateTradeForm = ({ fetchTrades, displayInstrument, storeDisplayInstrument }) => {
     
     const SATS_PER_BTC = 100000000;
 
     const [tradeLong, setTradeLong] = useState<boolean>(true);
-    const [instrument, setInstrument] = useState<string|null>('BTCUSD');
     const [quantity, setQuantity] = useState<number>(0.2);
     const [leverage, setLeverage] = useState<number>(1);
 
@@ -20,7 +20,7 @@ const CreateTradeForm = ({ fetchTrades }) => {
     const clickBuy = () => {
         
         const data = {
-            instrument: instrument,
+            instrument: displayInstrument,
             quantity: quantity * SATS_PER_BTC,
             leverage: leverage,
             // side: tradeLong ? 'LONG' : 'SHORT'
@@ -82,11 +82,11 @@ const CreateTradeForm = ({ fetchTrades }) => {
                     <select 
                         id="instrument"
                         className="border border-gray-300 hover:border-gray-400 active:border-gray-400 rounded-sm outline-hidden py-2 px-4 transition-colors duration-200"
-                        value={instrument}
+                        value={displayInstrument}
                         defaultValue={"BTCUSD"}
-                        onChange={(e) => setInstrument(e.target.value)}
+                        onChange={(e) => storeDisplayInstrument(e.target.value)}
                     >
-                        <option value="BTCUSD">BTCUSD</option>
+                        {instruments.map((input) => <option value={input}>{input.replace('USD', '')}</option>)}
                     </select>
                 </div>
 

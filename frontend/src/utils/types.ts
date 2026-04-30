@@ -40,3 +40,10 @@ export type Account = {
     updated_at: Date;
 
 }
+
+export const instruments = ['BTCUSD', 'ETHUSD', 'BNBUSD'];
+export type Instrument = typeof instruments[number];
+
+export const isInstrument = (value: string): value is Instrument => 
+    value === "BTCUSD" || value === "ETHUSD" || value === "BNBUSD";
+
