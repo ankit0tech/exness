@@ -1,9 +1,9 @@
 import { useState } from "react";
 import api from "../utils/api";
 import { enqueueSnackbar } from "notistack";
-import { instruments } from "../utils/types.js";
+import type { Instrument } from "../utils/types";
 
-const CreateTradeForm = ({ fetchTrades, displayInstrument, storeDisplayInstrument }) => {
+const CreateTradeForm = ({ fetchTrades, displayInstrument, storeDisplayInstrument, instruments}) => {
     
     const SATS_PER_BTC = 100000000;
 
@@ -83,10 +83,9 @@ const CreateTradeForm = ({ fetchTrades, displayInstrument, storeDisplayInstrumen
                         id="instrument"
                         className="border border-gray-300 hover:border-gray-400 active:border-gray-400 rounded-sm outline-hidden py-2 px-4 transition-colors duration-200"
                         value={displayInstrument}
-                        defaultValue={"BTCUSD"}
                         onChange={(e) => storeDisplayInstrument(e.target.value)}
                     >
-                        {instruments.map((input) => <option value={input}>{input.replace('USD', '')}</option>)}
+                        {instruments.map((instrument: Instrument) => <option key={instrument.id} value={instrument.symbol}>{instrument.base_asset}</option>)}
                     </select>
                 </div>
 

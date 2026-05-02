@@ -9,7 +9,8 @@ import tradingImg from "../assets/trading.png";
 
 interface JwtPayload {
     email: string,
-    userId: string
+    userId: string,
+    role: string
 };
 
 
@@ -36,6 +37,7 @@ const Login = () => {
                     
                     localStorage.setItem('authToken', jwtToken);
                     localStorage.setItem('email', tokenData.email);
+                    localStorage.setItem('role', tokenData.role);
         
                     navigate('/');
                 }                

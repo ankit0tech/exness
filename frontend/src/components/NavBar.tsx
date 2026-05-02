@@ -14,6 +14,9 @@ const NavBar = () => {
     const navigate = useNavigate();
     const profileMenuRef = useRef<HTMLDivElement | null>(null);
 
+    const user_role = localStorage.getItem('role');
+
+
     useClickOutside(profileMenuRef, (event: MouseEvent|TouchEvent) => setShowProfileMenu(false));
 
     const handleSignout = async () => {
@@ -64,6 +67,15 @@ const NavBar = () => {
                         </div>
 
                         <div className="flex w-full flex-col items-start p-2">
+                            {user_role === 'ADMIN' && (
+                                <button 
+                                    type="button"
+                                    className="w-full cursor-pointer rounded-sm px-3 py-2 text-left text-sm text-gray-700 transition-colors duration-200 hover:bg-gray-100"
+                                    onClick={() => {setShowProfileMenu(false); navigate('/admin/dashboard')}}
+                                > 
+                                    Admin Dashboard
+                                </button> 
+                            )}
                             <button 
                                 type="button"
                                 className="w-full cursor-pointer rounded-sm px-3 py-2 text-left text-sm text-gray-700 transition-colors duration-200 hover:bg-gray-100"

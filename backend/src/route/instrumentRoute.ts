@@ -7,11 +7,39 @@ const router = express.Router();
 const prisma = new PrismaClient();
 
 
-router.get('/', authMiddleware, async (req: Request, res: Response) => {
+router.get('/active', authMiddleware, async (req: Request, res: Response) => {
+
+    try {
+        const instruments = await prisma.instrument.findMany({
+            where: {
+                is_active: true
+            },
+            orderBy: {
+                id: 'asc'
+            }
+        });
+
+        const returnInstruments = instruments.map((input) => ({
+            ...input,
+            max_leverage: input.max_leverage.toString(),
+            min_quantity: input.min_quantity.toString(),
+            fees_per_unit: input.fees_per_unit.toString()
+        }));
+        
+        console.log(returnInstruments);
+
+        return res.status(200).json(returnInstruments);
+
+    } catch(error: any) {
+        console.log("error:", error);
+        return res.status(500).json({message: "An unexpected error occurred. Please try again later."});
+    }
+});
+
+router.get('/', roleMiddleware(['ADMIN']), async (req: Request, res: Response) => {
 
     try {
         const instruments = await prisma.instrument.findMany({});
-        console.log(instruments);
 
         const returnInstruments = instruments.map((input) => ({
             ...input,
@@ -28,7 +56,7 @@ router.get('/', authMiddleware, async (req: Request, res: Response) => {
     }
 });
 
-router.get('/:id', authMiddleware, async (req: Request, res: Response) => {
+router.get('/:id', roleMiddleware(['ADMIN']), async (req: Request, res: Response) => {
 
     try {
         const id = Number(req.params.id);
@@ -64,7 +92,7 @@ router.get('/:id', authMiddleware, async (req: Request, res: Response) => {
     }
 });
 
-router.post('/create', authMiddleware, async (req: Request, res: Response) => {
+router.post('/create', roleMiddleware(['ADMIN']), async (req: Request, res: Response) => {
     try {
 
         const result = instrumentZod.safeParse(req.body);
@@ -95,7 +123,7 @@ router.post('/create', authMiddleware, async (req: Request, res: Response) => {
     }
 });
 
-router.post('/update/:id', authMiddleware, async (req: Request, res: Response) => {
+router.post('/update/:id', roleMiddleware(['ADMIN']), async (req: Request, res: Response) => {
     try {
 
         const id = Number(req.params.id);

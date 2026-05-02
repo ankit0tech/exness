@@ -16,7 +16,6 @@ const Instruments = () => {
 
         api.get('/instrument')
         .then((response) => {
-            console.log(response);
             setInstruments(response.data);
         })
         .catch((error: any) => {
@@ -66,13 +65,13 @@ const Instruments = () => {
                                         <div className="flex items-center gap-2 mx-1">
                                             <button 
                                                 className="text-blue-700 text-lg"
-                                                onClick={() => navigate(`/instrument/details/${instrument.id}`)}
+                                                onClick={() => navigate(`/admin/instrument/details/${instrument.id}`)}
                                             >
                                                 <AiOutlineEye/>
                                             </button>
                                             <button 
                                                 className="text-yellow-600 text-lg"
-                                                onClick={() => navigate(`/instrument/edit/${instrument.id}`)}
+                                                onClick={() => navigate(`/admin/instrument/edit/${instrument.id}`)}
                                             >
                                                 <AiOutlineEdit/>
                                             </button>

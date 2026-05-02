@@ -59,9 +59,9 @@ export type Instrument = {
   
 }
 
-export const instruments = ['BTCUSD', 'ETHUSD', 'BNBUSD'];
-export type Instruments = typeof instruments[number];
+// export const instruments = ['BTCUSD', 'ETHUSD', 'BNBUSD'];
+// export type Instruments = typeof instruments[number];
 
-export const isInstrument = (value: string): value is Instruments => 
-    value === "BTCUSD" || value === "ETHUSD" || value === "BNBUSD";
+// export const isInstrument = (value: string): value is Instruments => 
+//     value === "BTCUSD" || value === "ETHUSD" || value === "BNBUSD";
 

@@ -59,7 +59,8 @@ router.post('/login/federated/google', async (req, res) => {
         const jwtToken = jwt.sign({
                 email: user.email,
                 userId: user.id,
-                type: 'login'
+                type: 'login',
+                role: user.user_type
             },
             config.auth.jwtSecret,
             { expiresIn: '1h' }

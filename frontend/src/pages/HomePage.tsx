@@ -2,29 +2,31 @@ import axios from "axios";
 import { AreaSeries, CandlestickSeries, createChart } from "lightweight-charts";
 import type { UTCTimestamp } from 'lightweight-charts';
 
-// import { eventNames } from "process";
 import { useEffect, useRef, useState } from "react";
 import api from "../utils/api.js";
 import { enqueueSnackbar } from "notistack";
 import type { Trade } from "../utils/types.js";
 import CreateTradeForm from "../components/CreateTradeForm.js";
 import ListTrades from "../components/ListTrades.js";
-import type { Instruments } from "../utils/types.js";
-import { instruments, isInstrument } from "../utils/types.js";
+import type { Instrument } from "../utils/types.js";
+
 
 const HomePage = () => {
 
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [openTrades, setOpenTrades] = useState<Trade[]>([]);
     const [closedTrades, setClosedTrades] = useState<Trade[]>([]);
     const chartRef = useRef<HTMLDivElement|null>(null);
-    const [displayInstrument, setDisplayInstrument] = useState<Instruments>(() => {
+    const [instruments, setInstruments] = useState<Instrument[]>([]);
+
+    const [displayInstrument, setDisplayInstrument] = useState<string>(() => {
         const storageInstrument = localStorage.getItem("displayInstrument");
-        return storageInstrument && isInstrument(storageInstrument) ? storageInstrument : "BTCUSD";
+        return storageInstrument ? storageInstrument : 'BTCUSD';
     });
 
-    const storeDisplayInstrument = (input: Instruments) => {
-        localStorage.setItem("displayInstrument", input);
+    const storeDisplayInstrument = (input: string) => {
         setDisplayInstrument(input);
+        localStorage.setItem("displayInstrument", input);
     }
 
     const backendWebSocketurl = "ws://localhost:3000";
@@ -33,7 +35,6 @@ const HomePage = () => {
         if(!chartRef.current) return;
 
         const ws = new WebSocket(backendWebSocketurl);
-        // "77511.90"
 
         ws.onopen = () => { console.log('websocket connected'); }
         // setSocket(ws);
@@ -81,7 +82,6 @@ const HomePage = () => {
         });
 
         const historicAPI = `https://api.binance.com/api/v3/klines?symbol=${displayInstrument}T&interval=1m&limit=30`;
-        // const historicAPI = `https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1m&limit=30`;
 
         axios.get(historicAPI)
         .then((response) => {
@@ -144,7 +144,7 @@ const HomePage = () => {
             chart.remove();
         }
 
-    }, [displayInstrument]);
+    }, [displayInstrument, instruments]);
 
     const fetchTrades = () => {
         fetchOpenTrades();
@@ -173,34 +173,65 @@ const HomePage = () => {
         });
     }
 
+    useEffect(() => {
+
+        setIsLoading(true);
+
+        api.get('/instrument/active')
+        .then((response) => {
+            setInstruments(response.data);
+        })
+        .catch((error: any) => {
+            console.log(error.message);
+            enqueueSnackbar('Error while loading instruments', { variant: "error" });
+        })
+        .finally(() => {
+            setIsLoading(false);
+        });
+
+    }, []);
 
     return (
         <div className="flex flex-col gap-4 p-4">
-            <div className="w-fit flex border border-gray-300 bg-gray-50 overflow-hidden">
-                {instruments.map((input) => <button
-                        type="button"
-                        onClick={() => storeDisplayInstrument(input)}
-                        className={`py-2 px-4 font-semibold cursor-pointer text-sm text-gray-600 transition-colors duration-200 border-gray-300 ${displayInstrument === input ? 'text-gray-700 bg-white shadow-sm border-b ' : 'text-gray-600 hover:text-gray-700 hover:bg-gray-100'}`}
-                    >
-                        {input.replace("USD", "")}
-                    </button>
-                )}
-            </div>
-
-            <div className="flex flex-row gap-2">
-                <div className="w-full ring ring-gray-300 rounded-md shadow-sm p-4">
-                    <div 
-                        className="w-full h-[480px]"
-                        ref={chartRef} 
-                    >
-                    </div>
+            {isLoading ? (
+                <div className="font-semibold text-gray-700">
+                    Loading...
                 </div>
-
-                <CreateTradeForm fetchTrades={fetchTrades} displayInstrument={displayInstrument} storeDisplayInstrument={storeDisplayInstrument} />
-            </div>
-
-            <ListTrades fetchTrades={fetchTrades} openTrades={openTrades} closedTrades={closedTrades} />
-
+            ) : (
+                instruments.length === 0 ? (
+                    <div className="font-semibold text-gray-700">
+                        No data to display...
+                    </div>
+                ) : (
+                    <>
+                        <div className="w-fit flex border border-gray-300 bg-gray-50 overflow-hidden">
+                            {instruments.map((input) => <button
+                                    key={input.id}
+                                    type="button"
+                                    onClick={() => storeDisplayInstrument(input.symbol)}
+                                    className={`py-2 px-4 font-semibold cursor-pointer text-sm text-gray-600 transition-colors duration-200 border-gray-300 ${displayInstrument === input.symbol ? 'text-gray-700 bg-white shadow-sm border-b ' : 'text-gray-600 hover:text-gray-700 hover:bg-gray-100'}`}
+                                >
+                                    { input.base_asset }
+                                </button>
+                            )}
+                        </div>
+            
+                        <div className="flex flex-row gap-2">
+                            <div className="w-full ring ring-gray-300 rounded-md shadow-sm p-4">
+                                <div 
+                                    className="w-full h-[480px]"
+                                    ref={chartRef} 
+                                >
+                                </div>
+                            </div>
+            
+                            <CreateTradeForm fetchTrades={fetchTrades} displayInstrument={displayInstrument} storeDisplayInstrument={storeDisplayInstrument} instruments={instruments}/>
+                        </div>
+            
+                        <ListTrades fetchTrades={fetchTrades} openTrades={openTrades} closedTrades={closedTrades} />
+                    </>
+                )
+            )}
         </div>
     );
 }

@@ -90,7 +90,7 @@ const InstrumentDetails = () => {
 
                     <button
                         type="button"
-                        onClick={() => navigate(`/instrument/edit/${instrument.id}`)}
+                        onClick={() => navigate(`/admin/instrument/edit/${instrument.id}`)}
                         className='self-end w-fit cursor-pointer rounded-md border border-[hsla(209,95%,53%,1)] bg-[hsla(209,95%,53%,1)] px-4 py-2 text-sm font-medium text-white transition-transform transition-colors duration-300 active:scale-98 disabled:cursor-not-allowed disabled:opacity-70'
                     >
                         Edit Instrument Details

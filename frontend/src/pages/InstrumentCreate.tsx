@@ -71,7 +71,7 @@ const InstrumentCreate = () => {
 
         api.post(url, data)
         .then((_response) => {
-            console.log(_response);
+            enqueueSnackbar(`Instrument ${createInstrument ? 'created' : 'updated'} successfully`, { variant: "success" });
         })
         .catch((error: any) => {
             console.log(error.message);
@@ -86,8 +86,7 @@ const InstrumentCreate = () => {
         
         api.get(`instrument/${id}`)
         .then((response) => {
-            console.log(response);
-
+            
             setCreateInstrument(false);
             
             setSymbol(response.data.symbol);
