@@ -19,12 +19,12 @@ export type Trade = {
     exit_time: Date | null;
     realized_pnl: string;  // bigint -> string
 
-    created_at: Date;
-    updated_at: Date;
+    created_at?: Date;
+    updated_at?: Date;
 
     instrument: {
-        base_asset: string;
         symbol: string;
+        base_asset: string;
     };
 };
 
@@ -36,14 +36,32 @@ export type Account = {
     used_margin: string;
     currency: string
 
-    created_at: Date;
-    updated_at: Date;
+    created_at?: Date;
+    updated_at?: Date;
 
 }
 
-export const instruments = ['BTCUSD', 'ETHUSD', 'BNBUSD'];
-export type Instrument = typeof instruments[number];
+export type Instrument = {
+    id: number;
+    symbol: string;
+    base_asset: string;
+    quote_currency: string;
+    
+    max_leverage: string;
+    min_quantity: string;
+    is_active: boolean;
+    fees_per_unit: string;
+  
+    trades: Trade[]
+  
+    created_at?: Date;
+    updated_at?: Date;
+  
+}
 
-export const isInstrument = (value: string): value is Instrument => 
+export const instruments = ['BTCUSD', 'ETHUSD', 'BNBUSD'];
+export type Instruments = typeof instruments[number];
+
+export const isInstrument = (value: string): value is Instruments => 
     value === "BTCUSD" || value === "ETHUSD" || value === "BNBUSD";
 

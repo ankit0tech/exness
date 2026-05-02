@@ -58,5 +58,45 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
             return res.status(401).json({ message: 'Authentication failed: invalid token'});
         }
     });
-    
+}
+
+
+export const roleMiddleware = (allowedRoles: string[]) => {
+
+    return async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            // First authenticate the user and then check for addmin role
+            authMiddleware(req, res, async () => {
+                    if(req.authEmail === undefined) {
+                        return res.status(401).json({message: "Authentication failed"});
+                    }
+
+                    const user = await prisma.userinfo.findUnique({
+                        where: {
+                            email: req.authEmail
+                        }, 
+                        select: {
+                            id: true,
+                            user_type: true,
+                            email: true,
+                        }
+                    });
+
+                    if(!user) {
+                        return res.status(401).json({message: "Authentication failed"});
+                    }
+                    
+                    if(!allowedRoles.includes(user.user_type)) {
+                        console.log(`Access denied for ${user.email}`);
+                        return res.status(403).json({message: "Access denied!"});
+                    }
+
+                    next();        
+                }
+            );
+        } catch(error: any) {
+            console.log(`Authorization failed: ${error.message}`);
+            return res.status(401).json({message: error.message});
+        }
+    } 
 }

@@ -4,6 +4,7 @@ import usersRoute from './route/usersRoute.js';
 import authRoute from './route/auth.js';
 import tradeRoute from './route/tradeRoute.js';
 import accountRoute from './route/accountRoute.js';
+import instrumentRoute from './route/instrumentRoute.js';
 import { config } from './config.js';
 
 const app = express();
@@ -63,6 +64,7 @@ app.use('/users', usersRoute);
 app.use('/auth', authRoute);
 app.use('/trade', tradeRoute);
 app.use('/account', accountRoute);
+app.use('/instrument', instrumentRoute);
 
 
 const port = config.server.port;

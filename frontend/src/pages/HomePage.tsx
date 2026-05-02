@@ -9,7 +9,7 @@ import { enqueueSnackbar } from "notistack";
 import type { Trade } from "../utils/types.js";
 import CreateTradeForm from "../components/CreateTradeForm.js";
 import ListTrades from "../components/ListTrades.js";
-import type { Instrument } from "../utils/types.js";
+import type { Instruments } from "../utils/types.js";
 import { instruments, isInstrument } from "../utils/types.js";
 
 const HomePage = () => {
@@ -17,12 +17,12 @@ const HomePage = () => {
     const [openTrades, setOpenTrades] = useState<Trade[]>([]);
     const [closedTrades, setClosedTrades] = useState<Trade[]>([]);
     const chartRef = useRef<HTMLDivElement|null>(null);
-    const [displayInstrument, setDisplayInstrument] = useState<Instrument>(() => {
+    const [displayInstrument, setDisplayInstrument] = useState<Instruments>(() => {
         const storageInstrument = localStorage.getItem("displayInstrument");
         return storageInstrument && isInstrument(storageInstrument) ? storageInstrument : "BTCUSD";
     });
 
-    const storeDisplayInstrument = (input: Instrument) => {
+    const storeDisplayInstrument = (input: Instruments) => {
         localStorage.setItem("displayInstrument", input);
         setDisplayInstrument(input);
     }

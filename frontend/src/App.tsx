@@ -5,6 +5,9 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 import HomePage from './pages/HomePage';
 import NavBar from './components/NavBar';
 import AccountDetails from './pages/AccountDetails.js';
+import Instruments from './pages/Instruments.js';
+import InstrumentDetails from './pages/InstrumentDetails.js';
+import InstrumentCreate from './pages/InstrumentCreate.js';
 
 
 function App() {
@@ -20,6 +23,10 @@ function App() {
           <Route path='/' element={<HomePage />} />
           <Route path='/login' element={<Login />} />
           <Route path='/account' element={<AccountDetails />} />
+          <Route path='/instruments' element={<Instruments />} />
+          <Route path='instrument/details/:id' element={<InstrumentDetails />} />
+          <Route path='instrument/create' element={<InstrumentCreate />} />
+          <Route path='instrument/edit/:id' element={<InstrumentCreate />} />
         </Routes>
         
       </GoogleOAuthProvider>
