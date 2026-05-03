@@ -10,6 +10,36 @@ import CreateTradeForm from "../components/CreateTradeForm.js";
 import ListTrades from "../components/ListTrades.js";
 import type { Instrument } from "../utils/types.js";
 
+type KlineMessage = {
+    symbol: string;
+    data: {
+        k: {
+            t: number;
+            o: string;
+            h: string;
+            l: string;
+            c: string;
+        };
+    };
+};
+
+const parseKlineMessage = (raw: string): KlineMessage | null => {
+    try {
+        const obj = JSON.parse(raw) as unknown;
+        if (!obj || typeof obj !== "object") return null;
+        const rec = obj as Record<string, unknown>;
+        if (typeof rec.symbol !== "string" || !rec.data || typeof rec.data !== "object") return null;
+        const data = rec.data as Record<string, unknown>;
+        const k = data.k as Record<string, unknown> | undefined;
+        if (!k || typeof k.t !== "number") return null;
+        for (const key of ["o", "h", "l", "c"] as const) {
+            if (typeof k[key] !== "string" && typeof k[key] !== "number") return null;
+        }
+        return obj as KlineMessage;
+    } catch {
+        return null;
+    }
+};
 
 const HomePage = () => {
 
@@ -32,45 +62,45 @@ const HomePage = () => {
     const backendWebSocketurl = "ws://localhost:3000";
 
     useEffect(() => {
-        if(!chartRef.current) return;
+        if (instruments.length === 0 || !chartRef.current) return;
+
+        let cancelled = false;
+        const abort = new AbortController();
+        const symbol = displayInstrument;
 
         const ws = new WebSocket(backendWebSocketurl);
+        const pendingKlines: KlineMessage[] = [];
+        let historicLoaded = false;
 
-        ws.onopen = () => { console.log('websocket connected'); }
-        // setSocket(ws);
-
-        // const chartOptions = { layout: { textColor: 'black', background: { type: 'solid', color: 'white' }}};
-        
         const chart = createChart(
-            chartRef.current, 
+            chartRef.current,
             {
                 layout: {
                     textColor: "black",
                     background: { color: "white" },
                 },
+                width: chartRef.current.clientWidth,
+                height: chartRef.current.clientHeight,
                 timeScale: {
-                    timeVisible: true,       // show intraday time
-                    secondsVisible: false,   // set true for second-level
-                    barSpacing: 8,           // more room for time ticks
-                    tickMarkFormatter: (time: any) => {
-                        const d = new Date((typeof time === "number" ? time : time.timestamp) * 1000);
+                    timeVisible: true,
+                    secondsVisible: false,
+                    barSpacing: 8,
+                    tickMarkFormatter: (time: number | { timestamp: number }) => {
+                        const t = typeof time === "number" ? time : time.timestamp;
+                        const d = new Date(t * 1000);
                         return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", hour12: false });
                     },
                 },
                 localization: {
-                    timeFormatter: (time: any) => {
-                        const d = new Date((typeof time === "number" ? time : time.timestamp) * 1000);
+                    timeFormatter: (time: number | { timestamp: number }) => {
+                        const t = typeof time === "number" ? time : time.timestamp;
+                        const d = new Date(t * 1000);
                         return d.toLocaleString();
                     },
                 },
             }
         );
 
-        // const areaSeries = chart.addSeries(AreaSeries);
-        // const barSeries = chart.addSeries(BarSeries);
-        // const baselineSeries = chart.addSeries(BaselineSeries);
-        
-        // const chart = createChart(document.getElementById('container'), chartOptions);
         const areaSeries = chart.addSeries(AreaSeries, {
             lineColor: '#2962FF', topColor: '#2962FF',
             bottomColor: 'rgba(41, 98, 255, 0.28)',
@@ -81,70 +111,105 @@ const HomePage = () => {
             wickUpColor: '#26a69a', wickDownColor: '#ef5350',
         });
 
-        const historicAPI = `https://api.binance.com/api/v3/klines?symbol=${displayInstrument}T&interval=1m&limit=30`;
-
-        axios.get(historicAPI)
-        .then((response) => {
-
-            const historicAreaSeries = response.data.map((obj: any) => {
-                return { 
-                    time: Math.floor(obj[0] / 1000) as UTCTimestamp,
-                    value: Number(obj[4])
-                };
+        const applyKline = (obj: KlineMessage) => {
+            if (cancelled || obj.symbol !== symbol) return;
+            const k = obj.data.k;
+            const time = Math.floor(k.t / 1000) as UTCTimestamp;
+            areaSeries.update({ time, value: Number(k.c) });
+            candlestickSeries.update({
+                time,
+                open: Number(k.o),
+                high: Number(k.h),
+                low: Number(k.l),
+                close: Number(k.c),
             });
+            chart.timeScale().scrollToRealTime();
+        };
 
-            const historicCandleStickSeries = response.data.map((obj: any) => {
-                return { 
+        ws.onmessage = (event) => {
+            if (cancelled) return;
+            const msg = parseKlineMessage(String(event.data));
+            if (!msg || msg.symbol !== symbol) return;
+            if (!historicLoaded) {
+                pendingKlines.push(msg);
+                if (pendingKlines.length > 120) pendingKlines.shift();
+                return;
+            }
+            applyKline(msg);
+        };
+
+        ws.onopen = () => {
+            if (!cancelled) console.log("websocket connected");
+        };
+
+        ws.onerror = () => {
+            if (!cancelled) {
+                enqueueSnackbar("Live price connection error", { variant: "warning" });
+            }
+        };
+
+        ws.onclose = (ev) => {
+            if (!cancelled && !ev.wasClean) {
+                enqueueSnackbar("Live price connection closed", { variant: "info" });
+            }
+        };
+
+        const historicAPI = `https://api.binance.com/api/v3/klines?symbol=${symbol}T&interval=1m&limit=120`;
+
+        axios
+            .get(historicAPI, { signal: abort.signal })
+            .then((response) => {
+                if (cancelled) return;
+
+                const historicAreaSeries = response.data.map((obj: number[]) => ({
+                    time: Math.floor(obj[0] / 1000) as UTCTimestamp,
+                    value: Number(obj[4]),
+                }));
+
+                const historicCandleStickSeries = response.data.map((obj: number[]) => ({
                     time: Math.floor(obj[0] / 1000) as UTCTimestamp,
                     open: Number(obj[1]),
                     high: Number(obj[2]),
                     low: Number(obj[3]),
-                    close: Number(obj[4])
-                };
+                    close: Number(obj[4]),
+                }));
+
+                areaSeries.setData(historicAreaSeries);
+                candlestickSeries.setData(historicCandleStickSeries);
+
+                historicLoaded = true;
+                for (const p of pendingKlines) applyKline(p);
+                pendingKlines.length = 0;
+
+                chart.timeScale().fitContent();
+            })
+            .catch((e: unknown) => {
+                if (cancelled || axios.isCancel(e)) return;
+                console.error(e);
+                enqueueSnackbar("Failed to load chart history", { variant: "error" });
             });
 
-            areaSeries.setData(historicAreaSeries);
-            candlestickSeries.setData(historicCandleStickSeries);
+        const resizeChart = () => {
+            if (cancelled || !chartRef.current) return;
+            const { width, height } = chartRef.current.getBoundingClientRect();
+            chart.resize(Math.floor(width), Math.floor(height));
+        };
 
-            ws.onmessage = (event) => {
-                const obj = JSON.parse(event.data);
-
-                // {"symbol":"BTCUSD","data":{"e":"kline","E":1777550363464,"s":"BTCUSDT","k":{}}}
-                // {"symbol":"ETHUSD","data":{"e":"kline","E":1777550363683,"s":"ETHUSDT","k":{}}}
-
-                if(obj.symbol === displayInstrument) {
-
-                    console.log('OBJ:', obj.data);
-
-                    areaSeries.update({
-                        time: Math.floor(obj.data.k.t / 1000) as UTCTimestamp,
-                        value: Number(obj.data.k.c)
-                    });
-    
-                    candlestickSeries.update({
-                        time: Math.floor(obj.data.k.t / 1000) as UTCTimestamp,
-                        open: Number(obj.data.k.o),
-                        high: Number(obj.data.k.h),
-                        low: Number(obj.data.k.l),
-                        close: Number(obj.data.k.c)
-                    });
-                }
-            }
-
-            chart.timeScale().fitContent();
-
-        })
-        .catch((e: any) => {
-            console.log(e);
-        });
-
+        const resizeObserver = new ResizeObserver(() => resizeChart());
+        resizeObserver.observe(chartRef.current);
+        window.addEventListener("resize", resizeChart);
+        resizeChart();
 
         return () => {
+            cancelled = true;
+            abort.abort();
+            window.removeEventListener("resize", resizeChart);
+            resizeObserver.disconnect();
             ws.close();
             chart.remove();
-        }
+        };
 
-    }, [displayInstrument, instruments]);
+    }, [displayInstrument, instruments.length]);
 
     const fetchTrades = () => {
         fetchOpenTrades();
@@ -179,7 +244,15 @@ const HomePage = () => {
 
         api.get('/instrument/active')
         .then((response) => {
-            setInstruments(response.data);
+            const list = response.data as Instrument[];
+            setInstruments(list);
+            if (list.length === 0) return;
+            setDisplayInstrument((prev) => {
+                if (list.some((i) => i.symbol === prev)) return prev;
+                const next = list[0].symbol;
+                localStorage.setItem("displayInstrument", next);
+                return next;
+            });
         })
         .catch((error: any) => {
             console.log(error.message);
@@ -215,19 +288,19 @@ const HomePage = () => {
                                 </button>
                             )}
                         </div>
-            
+
                         <div className="flex flex-row gap-2">
                             <div className="w-full ring ring-gray-300 rounded-md shadow-sm p-4">
-                                <div 
+                                <div
                                     className="w-full h-[480px]"
-                                    ref={chartRef} 
+                                    ref={chartRef}
                                 >
                                 </div>
                             </div>
-            
+
                             <CreateTradeForm fetchTrades={fetchTrades} displayInstrument={displayInstrument} storeDisplayInstrument={storeDisplayInstrument} instruments={instruments}/>
                         </div>
-            
+
                         <ListTrades fetchTrades={fetchTrades} openTrades={openTrades} closedTrades={closedTrades} />
                     </>
                 )
