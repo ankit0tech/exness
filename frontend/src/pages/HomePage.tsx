@@ -60,14 +60,14 @@ const HomePage = () => {
     }
 
     const backendWebSocketurl = "ws://localhost:3000";
-
+    
+    
     useEffect(() => {
         if (instruments.length === 0 || !chartRef.current) return;
-
-        let cancelled = false;
-        const abort = new AbortController();
+        
         const symbol = displayInstrument;
-
+        const historicAPI = `https://api.binance.com/api/v3/klines?symbol=${symbol}T&interval=1m&limit=120`;
+        
         const ws = new WebSocket(backendWebSocketurl);
         const pendingKlines: KlineMessage[] = [];
         let historicLoaded = false;
@@ -112,7 +112,7 @@ const HomePage = () => {
         });
 
         const applyKline = (obj: KlineMessage) => {
-            if (cancelled || obj.symbol !== symbol) return;
+            if (obj.symbol !== symbol) return;
             const k = obj.data.k;
             const time = Math.floor(k.t / 1000) as UTCTimestamp;
             areaSeries.update({ time, value: Number(k.c) });
@@ -126,40 +126,9 @@ const HomePage = () => {
             chart.timeScale().scrollToRealTime();
         };
 
-        ws.onmessage = (event) => {
-            if (cancelled) return;
-            const msg = parseKlineMessage(String(event.data));
-            if (!msg || msg.symbol !== symbol) return;
-            if (!historicLoaded) {
-                pendingKlines.push(msg);
-                if (pendingKlines.length > 120) pendingKlines.shift();
-                return;
-            }
-            applyKline(msg);
-        };
-
-        ws.onopen = () => {
-            if (!cancelled) console.log("websocket connected");
-        };
-
-        ws.onerror = () => {
-            if (!cancelled) {
-                enqueueSnackbar("Live price connection error", { variant: "warning" });
-            }
-        };
-
-        ws.onclose = (ev) => {
-            if (!cancelled && !ev.wasClean) {
-                enqueueSnackbar("Live price connection closed", { variant: "info" });
-            }
-        };
-
-        const historicAPI = `https://api.binance.com/api/v3/klines?symbol=${symbol}T&interval=1m&limit=120`;
-
         axios
-            .get(historicAPI, { signal: abort.signal })
+            .get(historicAPI)
             .then((response) => {
-                if (cancelled) return;
 
                 const historicAreaSeries = response.data.map((obj: number[]) => ({
                     time: Math.floor(obj[0] / 1000) as UTCTimestamp,
@@ -184,27 +153,37 @@ const HomePage = () => {
                 chart.timeScale().fitContent();
             })
             .catch((e: unknown) => {
-                if (cancelled || axios.isCancel(e)) return;
+                if (axios.isCancel(e)) return;
                 console.error(e);
                 enqueueSnackbar("Failed to load chart history", { variant: "error" });
             });
 
-        const resizeChart = () => {
-            if (cancelled || !chartRef.current) return;
-            const { width, height } = chartRef.current.getBoundingClientRect();
-            chart.resize(Math.floor(width), Math.floor(height));
+        ws.onopen = () => {
+            console.log("websocket connected");
         };
 
-        const resizeObserver = new ResizeObserver(() => resizeChart());
-        resizeObserver.observe(chartRef.current);
-        window.addEventListener("resize", resizeChart);
-        resizeChart();
+        ws.onmessage = (event) => {
+            const msg = parseKlineMessage(String(event.data));
+            if (!msg || msg.symbol !== symbol) return;
+            if (!historicLoaded) {
+                pendingKlines.push(msg);
+                if (pendingKlines.length > 120) pendingKlines.shift();
+                return;
+            }
+            applyKline(msg);
+        };
+
+        ws.onerror = () => {
+            enqueueSnackbar("Live price connection error", { variant: "warning" });
+        };
+
+        ws.onclose = (ev) => {
+            if (!ev.wasClean) {
+                enqueueSnackbar("Live price connection closed", { variant: "info" });
+            }
+        };
 
         return () => {
-            cancelled = true;
-            abort.abort();
-            window.removeEventListener("resize", resizeChart);
-            resizeObserver.disconnect();
             ws.close();
             chart.remove();
         };
