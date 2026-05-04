@@ -14,7 +14,7 @@ const decimalToScaledBigInt = (value: string, scale: number): bigint => {
     const decPart = (decPartRaw + "0".repeat(scale)).slice(0, scale);
     const sign = intPart.startsWith("-") ? -1n : 1n;
     const absInt = intPart.replace("-", "");
-    
+
     return sign * (BigInt(absInt || "0") * 10n ** BigInt(scale) + BigInt(decPart || "0"));
 }
 
@@ -27,17 +27,17 @@ class ApiError extends Error {
 }
 
 router.post('/create/long', authMiddleware, async (req: Request, res: Response) => {
-    
+
     try {
         const userId = req.userId;
         if(userId === undefined) {
             return res.status(401).json({ message: "Issue with authentication" });
         }
-        
+
         const result = tradeZod.safeParse(req.body);
-        
+
         if(result.success) {
-            
+
             const reqQuantity = BigInt(result.data.quantity);
             const reqLeverage = BigInt(result.data.leverage);
 
@@ -45,7 +45,7 @@ router.post('/create/long', authMiddleware, async (req: Request, res: Response) 
             if(!response.ok) {
                 throw new Error(`Error fetching data`);
             }
-            
+
             const data = await response.json();
             const price = decimalToScaledBigInt(data.price, 6);     // price of 1 BTC
 
@@ -55,7 +55,7 @@ router.post('/create/long', authMiddleware, async (req: Request, res: Response) 
             const calculateFees = (quantity: bigint, fees_per_unit: bigint): bigint => {
                 return quantity * fees_per_unit / SATS_PER_BTC;
             }
-        
+
             // $2 pee BTC => 20,00,000
             const instrument = await prisma.instrument.findUnique({
                 where: {
@@ -67,15 +67,15 @@ router.post('/create/long', authMiddleware, async (req: Request, res: Response) 
                     max_leverage: true
                 }
             });
-            
+
             if(!instrument) {
                 return res.status(400).json({ message: "Invalid data" });
             }
-            
+
             const required_margin = calculateMargin(reqQuantity, reqLeverage);
             const fees = calculateFees(reqQuantity, instrument.fees_per_unit);
-            
-            
+
+
             await prisma.$transaction(async (prisma) => {
                 const account = await prisma.account.findUnique({
                     where: {
@@ -86,11 +86,11 @@ router.post('/create/long', authMiddleware, async (req: Request, res: Response) 
                         free_margin: true
                     }
                 });
-                
+
                 if(!account) {
                     throw new ApiError(400, "Invalid data");
                 }
-                
+
                 if(required_margin > account.free_margin) {
                     throw new ApiError(400, "Your account don't have enough margin");
                 }
@@ -113,7 +113,7 @@ router.post('/create/long', authMiddleware, async (req: Request, res: Response) 
                         fees: fees
                     }
                 });
-                
+
                 const userAccount = await prisma.account.update({
                     where: {
                         user_id: userId
@@ -124,7 +124,7 @@ router.post('/create/long', authMiddleware, async (req: Request, res: Response) 
                         balance: { decrement: fees}
                     }
                 });
-                
+
                 await prisma.ledger_entry.create({
                     data: {
                         account_id: userAccount.id,
@@ -135,11 +135,11 @@ router.post('/create/long', authMiddleware, async (req: Request, res: Response) 
                     }
                 });
             });
-            
+
             return res.status(200).json({
                 message: "Trade executed successfully"
             });
-            
+
         } else {
             return res.status(400).json({
                 message: "Invalid data zod",
@@ -162,7 +162,7 @@ router.post('/close/long/:id', authMiddleware, async (req: Request, res: Respons
         if (!Number.isInteger(id) || id <= 0) {
             return res.status(400).json({ message: "Invalid trade id" });
         }
-        
+
         const userId = req.userId;
         if(userId === undefined) {
             return res.status(401).json({ message: "Issue with authentication" });
@@ -172,7 +172,7 @@ router.post('/close/long/:id', authMiddleware, async (req: Request, res: Respons
         if(!response.ok) {
             throw new Error(`Error fetching data`);
         }
-        
+
         const data = await response.json();
         const current_price = decimalToScaledBigInt(data.price, 6);     // price of 1 BTC
 
@@ -193,7 +193,7 @@ router.post('/close/long/:id', authMiddleware, async (req: Request, res: Respons
             if(!trade || trade.status !== 'OPEN') {
                 throw new Error('Requested trade does not exist or already closed');
             }
-            
+
             const entry_price = trade.entry_price;
             const pnl = (current_price - entry_price) * trade.quantity / SATS_PER_BTC;
 
@@ -228,12 +228,12 @@ router.post('/close/long/:id', authMiddleware, async (req: Request, res: Respons
                     type: "TRADE_PNL",
                     amount: pnl,
                     balance_after: account.balance,
-                }  
+                }
             });
         });
 
         console.log("sell order executed successfully");
-        
+
         return res.status(200).json({ message: "sell order executed successfully"});
 
     } catch(error: any) {
@@ -249,13 +249,13 @@ router.post('/create/short', authMiddleware, async (req: Request, res: Response)
             return res.status(401).json({ message: "Issue with authentication" });
         }
         console.log(req.body);
-        
+
         const result = tradeZod.safeParse(req.body);
-        
+
         if(result.success) {
             const reqQuantity = BigInt(result.data.quantity);
             const reqLeverage = BigInt(result.data.leverage);
-            
+
             const response = await fetch(tickerApi);
             if(!response.ok) {
                 throw new Error(`Error fetching data`);
@@ -299,11 +299,11 @@ router.post('/create/short', authMiddleware, async (req: Request, res: Response)
                         free_margin: true
                     }
                 });
-                
+
                 if(!account) {
                     throw new ApiError(400, "Invalid data");
                 }
-                
+
                 if(required_margin > account.free_margin) {
                     throw new ApiError(400, "Your account don't have enough margin");
                 }
@@ -326,7 +326,7 @@ router.post('/create/short', authMiddleware, async (req: Request, res: Response)
                         fees: fees
                     }
                 });
-                
+
                 const userAccount = await prisma.account.update({
                     where: {
                         user_id: userId
@@ -337,7 +337,7 @@ router.post('/create/short', authMiddleware, async (req: Request, res: Response)
                         balance: { decrement: fees}
                     }
                 });
-                
+
                 await prisma.ledger_entry.create({
                     data: {
                         account_id: userAccount.id,
@@ -350,7 +350,7 @@ router.post('/create/short', authMiddleware, async (req: Request, res: Response)
             });
 
             console.log("Trade executed successfully");
-            
+
             return res.status(200).json({
                 message: "Trade executed successfully"
             });
@@ -378,7 +378,7 @@ router.post('/close/short/:id', authMiddleware, async (req: Request, res: Respon
         if (!Number.isInteger(id) || id <= 0) {
             return res.status(400).json({ message: "Invalid trade id" });
         }
-        
+
         const userId = req.userId;
         if(userId === undefined) {
             return res.status(401).json({ message: "Issue with authentication" });
@@ -388,7 +388,7 @@ router.post('/close/short/:id', authMiddleware, async (req: Request, res: Respon
         if(!response.ok) {
             throw new Error(`Error fetching data`);
         }
-        
+
         const data = await response.json();
         const current_price = decimalToScaledBigInt(data.price, 6);     // price of 1 BTC
 
@@ -409,7 +409,7 @@ router.post('/close/short/:id', authMiddleware, async (req: Request, res: Respon
             if(!trade || trade.status !== 'OPEN') {
                 throw new Error('Requested trade does not exist or already closed');
             }
-            
+
             const entry_price = trade.entry_price;
             const pnl = (entry_price - current_price) * trade.quantity / SATS_PER_BTC;
 
@@ -444,12 +444,12 @@ router.post('/close/short/:id', authMiddleware, async (req: Request, res: Respon
                     type: "TRADE_PNL",
                     amount: pnl,
                     balance_after: account.balance,
-                }  
+                }
             });
         });
 
         console.log("sell order executed successfully");
-        
+
         return res.status(200).json({ message: "sell order executed successfully"});
 
     } catch (error: any) {
@@ -466,7 +466,7 @@ router.get('/open-trades', authMiddleware, async (req: Request, res: Response) =
         if(userId === undefined) {
             return res.status(401).json({ message: "Issue with authentication" });
         }
-        
+
         const openTrades = await prisma.trade.findMany({
             where: {
                 user_id: userId,
@@ -479,6 +479,9 @@ router.get('/open-trades', authMiddleware, async (req: Request, res: Response) =
                         symbol: true
                     }
                 }
+            },
+            orderBy: {
+                entry_time: 'desc'
             }
         });
 
@@ -508,7 +511,7 @@ router.get('/closed-trades', authMiddleware, async (req: Request, res: Response)
         if(userId === undefined) {
             return res.status(401).json({ message: "Issue with authentication" });
         }
-        
+
         const closedTrades = await prisma.trade.findMany({
             where: {
                 user_id: userId,
@@ -521,6 +524,9 @@ router.get('/closed-trades', authMiddleware, async (req: Request, res: Response)
                         symbol: true
                     }
                 }
+            },
+            orderBy: {
+                entry_time: 'desc'
             }
         });
 
