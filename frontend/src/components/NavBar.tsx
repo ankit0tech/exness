@@ -16,8 +16,7 @@ const NavBar = () => {
 
     const user_role = localStorage.getItem('role');
 
-
-    useClickOutside(profileMenuRef, (event: MouseEvent|TouchEvent) => setShowProfileMenu(false));
+    useClickOutside(profileMenuRef, (_event: MouseEvent|TouchEvent) => setShowProfileMenu(false));
 
     const handleSignout = async () => {
         try {

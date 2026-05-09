@@ -2,9 +2,16 @@ import { useEffect, useState } from "react";
 import { formatDateTime, prettifyString, formatPrice, formatQuantity } from "../utils/formatUtils";
 import api from "../utils/api";
 import { enqueueSnackbar } from "notistack";
+import type { Trade } from "../utils/types.js";
 
 
-const listTrades = ({ fetchTrades, openTrades, closedTrades}) => {
+interface ListTradesProps {
+    fetchTrades: () => void,
+    openTrades: Trade[],
+    closedTrades: Trade[]
+};
+
+const listTrades = ({ fetchTrades, openTrades, closedTrades }: ListTradesProps) => {
 
     const [showOpenTrades, setShowOpenTrades] = useState<boolean>(true);
 

@@ -3,7 +3,14 @@ import api from "../utils/api";
 import { enqueueSnackbar } from "notistack";
 import type { Instrument } from "../utils/types";
 
-const CreateTradeForm = ({ fetchTrades, displayInstrument, storeDisplayInstrument, instruments}) => {
+interface CreateTradeFormProps {
+    fetchTrades: () => void,
+    displayInstrument: string,
+    storeDisplayInstrument: (input: string) => void,
+    instruments: Instrument[]
+};
+
+const CreateTradeForm = ({ fetchTrades, displayInstrument, storeDisplayInstrument, instruments} : CreateTradeFormProps) => {
     
     const SATS_PER_BTC = 100000000;
 
