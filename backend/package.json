@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "description": "",
+  "type": "commonjs",
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/dotenv": "^6.1.1",
