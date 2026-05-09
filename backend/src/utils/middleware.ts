@@ -28,7 +28,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     }
     const authToken = bearerToken.split(' ')[1] || '';
 
-    jwt.verify(authToken, config.auth.jwtSecret, async (err, decoded)=> {
+    jwt.verify(authToken, config.auth.jwtSecret, async (err: any, decoded: string | jwt.JwtPayload | undefined)=> {
         if(err || !decoded) {
             return res.status(401).json({ message: 'Authentication failed: Invalid token' });
         }

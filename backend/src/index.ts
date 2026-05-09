@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 import usersRoute from './route/usersRoute.js';
 import authRoute from './route/auth.js';
@@ -23,7 +23,7 @@ app.use(
     cors(corsOptions)
 );
 
-app.use((req, res, next) => {
+app.use((_req: Request, res: Response, next: NextFunction) => {
     res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
     res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
     res.setHeader(
@@ -37,7 +37,7 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use((req, res, next) => {
+app.use((_req: Request, res: Response, next: NextFunction) => {
     res.setHeader(
         'Content-Security-Policy',
         "script-src 'self' gstatic.com google.com 'unsafe-inline' 'unsafe-eval'; " +
@@ -49,13 +49,13 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use((req, res, next) => { 
+app.use((_req: Request, res: Response, next: NextFunction) => { 
     res.setHeader('Cross-Origin-Opener-Policy', 'unsafe-none');
     next();
 });
 
 
-app.get('/', (request, response) => {
+app.get('/', (_request: Request, response: Response) => {
     return response.status(200).json({data: "Welcome"});
 });
 
