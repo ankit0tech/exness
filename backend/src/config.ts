@@ -38,10 +38,11 @@ export const config = {
     database: {
         url: process.env.DATABASE_URL
     },
-
     frontend: {
         url: process.env.FRONTEND_URL || 'http://localhost:5173',
         origins: (process.env.CORS_ORIGINS || 'http://localhost:5173').split(',').map((s: string) => s.trim()),
     },
-
+    websocket_api: {
+        port: process.env.WEBSOCKET_PORT || '3000'
+    }
 };

@@ -1,9 +1,10 @@
 import express, { Request, Response } from "express";
 import http from 'http';
 import { WebSocket, WebSocketServer } from 'ws';
+import { config } from './config.js';
 
 const app = express();
-const port = 3000;
+const port = config.websocket_api.port;
 
 // recieve data from binance using websocket
 const btcStreamUrl = 'wss://fstream.binance.com/market/ws/btcusdt@kline_1m';
