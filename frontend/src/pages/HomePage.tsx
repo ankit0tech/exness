@@ -59,7 +59,7 @@ const HomePage = () => {
         localStorage.setItem("displayInstrument", input);
     }
 
-    const backendWebSocketurl = "ws://localhost:3000";
+    const backendWebSocketurl = import.meta.env.VITE_WEBSOCKET_URL || "ws://localhost:3000";
     
     
     useEffect(() => {
