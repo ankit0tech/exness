@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 
 import { PrismaClient } from '../generated/prisma/client.js';
-import { authMiddleware } from "../utils/middleware";
+import { authMiddleware } from "../utils/middleware.js";
 import accountZod from '../zod/accountZod.js';
 
 

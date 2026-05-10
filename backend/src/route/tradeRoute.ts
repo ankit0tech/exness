@@ -1,8 +1,8 @@
 import express, { Request, Response } from "express";
-import tradeZod from "../zod/tradeZod";
+import tradeZod from "../zod/tradeZod.js";
 // import { PrismaClient } from "@prisma/client";
 import { PrismaClient } from '../generated/prisma/client.js';
-import { authMiddleware } from "../utils/middleware";
+import { authMiddleware } from "../utils/middleware.js";
 
 const prisma = new PrismaClient();
 const router = express.Router();

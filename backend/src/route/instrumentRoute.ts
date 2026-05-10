@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
-import { Prisma, PrismaClient } from '../generated/prisma/client';
-import { authMiddleware, roleMiddleware } from '../utils/middleware';
-import { instrumentZod, updateInstrumentZod } from '../zod/instrumentZod';
+import { Prisma, PrismaClient } from '../generated/prisma/client.js';
+import { authMiddleware, roleMiddleware } from '../utils/middleware.js';
+import { instrumentZod, updateInstrumentZod } from '../zod/instrumentZod.js';
 
 const router = express.Router();
 const prisma = new PrismaClient();
@@ -19,7 +19,7 @@ router.get('/active', authMiddleware, async (req: Request, res: Response) => {
             }
         });
 
-        const returnInstruments = instruments.map((input) => ({
+        const returnInstruments = instruments.map((input: any) => ({
             ...input,
             max_leverage: input.max_leverage.toString(),
             min_quantity: input.min_quantity.toString(),
@@ -41,7 +41,7 @@ router.get('/', roleMiddleware(['ADMIN']), async (req: Request, res: Response) =
     try {
         const instruments = await prisma.instrument.findMany({});
 
-        const returnInstruments = instruments.map((input) => ({
+        const returnInstruments = instruments.map((input: any) => ({
             ...input,
             max_leverage: input.max_leverage.toString(),
             min_quantity: input.min_quantity.toString(),
